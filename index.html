@@ -900,7 +900,7 @@
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const CONFIG = {
   fiberyWorkspace: 'navepadel',
-  fiberyToken: '61b942e2.583aed1e317e7bb83f9714b7d2df0305630',
+  fiberyToken: 'FIBERY_API_TOKEN',
   leadTimeDays: 5
 };
 
@@ -1546,37 +1546,14 @@ async function submitOrder() {
 }
 
 async function createFiberyOrder(order) {
-  const url = 'https://' + CONFIG.fiberyWorkspace + '.fibery.io/api/commands';
+  const url = 'https://hook.eu2.make.com/2omm45h90vm2tjsd2l6aiqf3j25eqgei';
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Token ' + CONFIG.fiberyToken
-    },
-    body: JSON.stringify([{
-      command: 'fibery.entity/create',
-      args: {
-        type: 'Catering/Orders',
-        entity: {
-          'Catering/Client Name':     order.clientName,
-          'Catering/Client Email':    order.clientEmail,
-          'Catering/Client Phone':    order.clientPhone,
-          'Catering/Company':         order.clientCompany,
-          'Catering/Event Date':      order.eventDate,
-          'Catering/Guest Count':     order.guestCount,
-          'Catering/Notes':           order.notes,
-          'Catering/Menu Name':       order.menuName,
-          'Catering/Price Per Person':order.pricePerPerson,
-          'Catering/Total Estimate':  order.totalEstimate,
-          'Catering/Selections':      order.selections,
-          'Catering/Status':          order.status,
-          'fibery/name': order.clientName + ' \u2014 ' + order.eventDate
-        }
-      }
-    }])
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order)
   });
-  if (!response.ok) throw new Error('Fibery ' + response.status);
-  return response.json();
+  if (!response.ok) throw new Error('Make webhook ' + response.status);
+  return response.text();
 }
 
 function generateRef() {
