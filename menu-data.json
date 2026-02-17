@@ -1,0 +1,103 @@
+{
+  "menus": [
+    {
+      "id": "mb1",
+      "code": "Menu MB 1",
+      "name": "Menu MB 1",
+      "description": "Menu de evento completo com 6 momentos gastronómicos.",
+      "pricePerPerson": 30,
+      "minGuests": 20,
+      "leadTimeDays": 5,
+      "active": true,
+      "courses": [
+        {
+          "id": "mb1-entradas",
+          "name": "ENTRADAS",
+          "displayOrder": 1,
+          "selectionRule": "choose_range",
+          "minSelections": 2,
+          "maxSelections": 2,
+          "ruleLabel": "1 couvert + escolha 2 entradas",
+          "active": true,
+          "dishes": [
+            { "id": "d-azeitonas", "name": "Azeitonas temperadas", "description": "", "active": true },
+            { "id": "d-humus", "name": "Húmus de beterraba", "description": "", "active": true },
+            { "id": "d-pasta-cabra", "name": "Pasta de queijo de cabra", "description": "", "active": true }
+          ]
+        },
+        {
+          "id": "mb1-sopas",
+          "name": "SOPAS",
+          "displayOrder": 2,
+          "selectionRule": "choose_exactly",
+          "minSelections": 1,
+          "maxSelections": 1,
+          "ruleLabel": "escolha 1",
+          "active": true,
+          "dishes": [
+            { "id": "d-sopa-cebola", "name": "Sopa de cebola com Mozzarella", "description": "", "active": true },
+            { "id": "d-creme-tomate", "name": "Creme de tomate com chouriço assado", "description": "", "active": true },
+            { "id": "d-creme-broculos", "name": "Creme de Brócolos", "description": "vegetariano", "active": true }
+          ]
+        },
+        {
+          "id": "mb1-vegetariano",
+          "name": "VEGETARIANO",
+          "displayOrder": 3,
+          "selectionRule": "choose_exactly",
+          "minSelections": 1,
+          "maxSelections": 1,
+          "ruleLabel": "escolha 1",
+          "active": true,
+          "dishes": [
+            { "id": "d-alho-frances", "name": "Alho Francês à Brás", "description": "com salada de tomate e manjericão", "active": true },
+            { "id": "d-lasanha-espinafres", "name": "Lasanha de Espinafres", "description": "com salada de couve coração", "active": true }
+          ]
+        },
+        {
+          "id": "mb1-peixe",
+          "name": "PEIXE",
+          "displayOrder": 4,
+          "selectionRule": "choose_exactly",
+          "minSelections": 1,
+          "maxSelections": 1,
+          "ruleLabel": "escolha 1",
+          "active": true,
+          "dishes": [
+            { "id": "d-bacalhau-broa", "name": "Bacalhau com Broa e Espinafres", "description": "com salada de alface branca", "active": true },
+            { "id": "d-gratinado-peixe", "name": "Gratinado de peixe e cogumelos", "description": "com arroz de coentros", "active": true }
+          ]
+        },
+        {
+          "id": "mb1-carnes",
+          "name": "CARNES",
+          "displayOrder": 5,
+          "selectionRule": "choose_exactly",
+          "minSelections": 1,
+          "maxSelections": 1,
+          "ruleLabel": "escolha 1",
+          "active": true,
+          "dishes": [
+            { "id": "d-escalopes-frango", "name": "Escalopes de Frango Braseados", "description": "em molho de mostarda, pera assada e espinafres", "active": true },
+            { "id": "d-rolo-carne", "name": "Rolo de carne misto", "description": "com massinha de molho de cogumelos", "active": true }
+          ]
+        },
+        {
+          "id": "mb1-sobremesas",
+          "name": "SOBREMESAS",
+          "displayOrder": 6,
+          "selectionRule": "choose_exactly",
+          "minSelections": 1,
+          "maxSelections": 1,
+          "ruleLabel": "escolha 1",
+          "active": true,
+          "dishes": [
+            { "id": "d-cremana", "name": "Cremana com frutas da época", "description": "creme de natas, hortelã e açúcar", "active": true },
+            { "id": "d-pao-lo", "name": "Pão de ló mergulhado", "description": "em leite creme e canela", "active": true },
+            { "id": "d-iogurte-grego", "name": "Doce de iogurte Grego", "description": "com frutos silvestres e suspiros", "active": true }
+          ]
+        }
+      ]
+    }
+  ]
+}

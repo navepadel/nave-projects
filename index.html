@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAVE. — Catering para Eventos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ocre: #BC5828;
+    --verde: #006E54;
+    --black: #0F0D0A;
+    --cream: #F7F4EF;
+    --cream-dark: #EDE9E1;
+    --grey: #7F7870;
+    --grey-light: #C8C4BC;
+    --white: #FFFFFF;
+    --error: #C0392B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--cream);
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--black);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid var(--ocre);
+  }
+
+  .logo-area {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .logo-text {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--grey);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .header-label {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--grey);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    background: var(--black);
+    padding: 0 48px 24px;
+    display: flex;
+    gap: 0;
+  }
+
+  .step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 2px solid var(--grey);
+    opacity: 0.4;
+    transition: all 0.3s ease;
+  }
+
+  .step.active { opacity: 1; border-bottom-color: var(--ocre); }
+  .step.done { opacity: 0.7; border-bottom-color: var(--verde); }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--grey);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step.active .step-num { background: var(--ocre); }
+  .step.done .step-num { background: var(--verde); }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── MENU SELECTION ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ocre);
+    margin-bottom: 8px;
+  }
+
+  .section-heading {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .section-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--grey);
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+
+  /* ── MENU CARDS ── */
+  .menu-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .menu-card {
+    background: var(--white);
+    border: 2px solid var(--cream-dark);
+    padding: 32px 28px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .menu-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--ocre);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+    transform-origin: bottom;
+  }
+
+  .menu-card:hover { border-color: var(--ocre); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .menu-card:hover::before { transform: scaleY(1); }
+  .menu-card.selected { border-color: var(--ocre); background: #FDF8F5; }
+  .menu-card.selected::before { transform: scaleY(1); }
+
+  .menu-card-code {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ocre);
+    margin-bottom: 8px;
+  }
+
+  .menu-card-name {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .menu-card-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--grey);
+    font-style: italic;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .menu-card-price {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--verde);
+  }
+
+  .menu-card-price span {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--grey);
+    margin-left: 4px;
+  }
+
+  .menu-card-min {
+    font-size: 11px;
+    color: var(--grey-light);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  .selected-check {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 24px; height: 24px;
+    background: var(--ocre);
+    border-radius: 50%;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+
+  .menu-card.selected .selected-check { display: flex; }
+  .selected-check::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+
+  /* ── COURSE SELECTION ── */
+  .course-block {
+    margin-bottom: 36px;
+    border: 1px solid var(--cream-dark);
+    background: var(--white);
+  }
+
+  .course-header {
+    padding: 18px 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--cream-dark);
+    background: var(--cream);
+  }
+
+  .course-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ocre);
+  }
+
+  .course-rule {
+    font-size: 11px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--grey);
+  }
+
+  .course-status {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .course-status.pending { background: var(--cream-dark); color: var(--grey); }
+  .course-status.done { background: #E8F4F0; color: var(--verde); }
+  .course-status.error { background: #FDF0EE; color: var(--error); }
+
+  .dish-list {
+    padding: 8px 0;
+  }
+
+  .dish-item {
+    padding: 14px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .dish-item:last-child { border-bottom: none; }
+  .dish-item:hover { background: var(--cream); }
+  .dish-item.selected { background: #FDF8F5; }
+
+  .dish-checkbox {
+    width: 18px; height: 18px;
+    border: 2px solid var(--grey-light);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .dish-item.selected .dish-checkbox {
+    background: var(--ocre);
+    border-color: var(--ocre);
+  }
+
+  .dish-item.selected .dish-checkbox::after {
+    content: '✓';
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .dish-info { flex: 1; }
+
+  .dish-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 2px;
+  }
+
+  .dish-detail {
+    font-size: 12px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--grey);
+    line-height: 1.4;
+  }
+
+  /* ── VALIDATION MESSAGES ── */
+  .validation-msg {
+    padding: 10px 24px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--error);
+    background: #FDF0EE;
+    display: none;
+    border-top: 1px solid #F5D5D0;
+  }
+
+  .validation-msg.visible { display: block; }
+
+  /* ── EVENT DETAILS FORM ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  input, select, textarea {
+    padding: 12px 16px;
+    border: 1.5px solid var(--cream-dark);
+    background: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--black);
+    outline: none;
+    transition: border-color 0.2s;
+    border-radius: 0;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--ocre);
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  input.error, select.error { border-color: var(--error); }
+
+  .field-error {
+    font-size: 11px;
+    color: var(--error);
+    font-style: italic;
+    display: none;
+  }
+
+  .field-error.visible { display: block; }
+
+  /* ── ORDER SUMMARY ── */
+  .summary-block {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    margin-bottom: 24px;
+  }
+
+  .summary-header {
+    padding: 16px 24px;
+    background: var(--black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .summary-header-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .summary-header-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ocre);
+  }
+
+  .summary-row {
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--cream-dark);
+    font-size: 13px;
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-label {
+    font-weight: 300;
+    color: var(--grey);
+    font-style: italic;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    margin-right: 16px;
+    padding-top: 2px;
+  }
+
+  .summary-value {
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .summary-price-row {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--cream);
+    border-top: 2px solid var(--ocre);
+  }
+
+  .summary-price-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .summary-price-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--verde);
+  }
+
+  .summary-price-note {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--grey);
+    font-style: italic;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: var(--ocre);
+    color: var(--white);
+  }
+
+  .btn-primary:hover { background: #A34D23; transform: translateY(-1px); }
+  .btn-primary:disabled { background: var(--grey-light); cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--grey);
+    border: 1.5px solid var(--grey-light);
+  }
+
+  .btn-secondary:hover { border-color: var(--grey); color: var(--black); }
+
+  /* ── SUCCESS STATE ── */
+  .success-wrap {
+    text-align: center;
+    padding: 60px 40px;
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+  }
+
+  .success-icon {
+    width: 64px; height: 64px;
+    background: var(--verde);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 28px;
+    color: white;
+  }
+
+  .success-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .success-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--grey);
+    font-style: italic;
+    margin-bottom: 32px;
+  }
+
+  .order-ref {
+    display: inline-block;
+    background: var(--cream);
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--ocre);
+    margin-bottom: 32px;
+  }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,13,10,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .loading-overlay.visible { display: flex; }
+
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: var(--ocre);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    color: white;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── ERROR STATE ── */
+  .error-banner {
+    background: #FDF0EE;
+    border: 1px solid #F5D5D0;
+    border-left: 4px solid var(--error);
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--error);
+    display: none;
+  }
+
+  .error-banner.visible { display: block; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    header { padding: 20px 20px; }
+    .progress-bar { padding: 0 20px 20px; }
+    main { padding: 32px 16px 60px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .section-heading { font-size: 26px; }
+    .btn-row { flex-direction: column; }
+    .btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">A processar...</div>
+</div>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-text">NAVE.</div>
+    <div class="logo-sub">Padel × Pickleball</div>
+  </div>
+  <div class="header-label">Catering<br>para Eventos</div>
+</header>
+
+<div class="progress-bar">
+  <div class="step active" id="step-1">
+    <div class="step-num">1</div>
+    <div class="step-label">Menu</div>
+  </div>
+  <div class="step" id="step-2">
+    <div class="step-num">2</div>
+    <div class="step-label">Pratos</div>
+  </div>
+  <div class="step" id="step-3">
+    <div class="step-num">3</div>
+    <div class="step-label">Evento</div>
+  </div>
+  <div class="step" id="step-4">
+    <div class="step-num">4</div>
+    <div class="step-label">Confirmar</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- STEP 1: Choose Menu -->
+  <div class="section active" id="section-1">
+    <div class="section-title">Passo 1 de 4</div>
+    <div class="section-heading">Escolha o seu menu</div>
+    <div class="section-sub">Todos os menus incluem couvert, prato de sopa, prato principal e sobremesa.</div>
+
+    <div class="menu-cards" id="menuCards"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goToStep(2)" id="btn-step1">
+        Continuar →
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Choose Dishes -->
+  <div class="section" id="section-2">
+    <div class="section-title">Passo 2 de 4</div>
+    <div class="section-heading" id="step2-heading">Selecione os pratos</div>
+    <div class="section-sub" id="step2-sub"></div>
+
+    <div id="coursesContainer"></div>
+
+    <div id="validationBanner" class="error-banner">
+      Por favor complete todas as seleções obrigatórias antes de continuar.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(1)">← Voltar</button>
+      <button class="btn btn-primary" onclick="goToStep(3)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Event Details -->
+  <div class="section" id="section-3">
+    <div class="section-title">Passo 3 de 4</div>
+    <div class="section-heading">Detalhes do evento</div>
+    <div class="section-sub">Indique as informações do seu evento para finalizarmos a proposta.</div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" id="clientName" placeholder="Nome completo">
+        <div class="field-error" id="err-name">Campo obrigatório</div>
+      </div>
+      <div class="form-group">
+        <label>Empresa / Organização</label>
+        <input type="text" id="clientCompany" placeholder="Opcional">
+      </div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="clientEmail" placeholder="email@exemplo.com">
+        <div class="field-error" id="err-email">Email inválido</div>
+      </div>
+      <div class="form-group">
+        <label>Telefone *</label>
+        <input type="tel" id="clientPhone" placeholder="+351 9XX XXX XXX">
+        <div class="field-error" id="err-phone">Campo obrigatório</div>
+      </div>
+      <div class="form-group">
+        <label>Data do Evento *</label>
+        <input type="date" id="eventDate">
+        <div class="field-error" id="err-date">Data inválida (mínimo 5 dias de antecedência)</div>
+      </div>
+      <div class="form-group">
+        <label>Nº de Pessoas *</label>
+        <input type="number" id="guestCount" placeholder="Mínimo 20" min="1">
+        <div class="field-error" id="err-guests">Verifique o número mínimo de pessoas</div>
+      </div>
+      <div class="form-group full">
+        <label>Notas adicionais</label>
+        <textarea id="eventNotes" placeholder="Alergias, preferências, pedidos especiais..."></textarea>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(2)">← Voltar</button>
+      <button class="btn btn-primary" onclick="goToStep(4)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Review & Submit -->
+  <div class="section" id="section-4">
+    <div class="section-title">Passo 4 de 4</div>
+    <div class="section-heading">Confirmar pedido</div>
+    <div class="section-sub">Reveja os detalhes antes de submeter.</div>
+
+    <div id="summaryContent"></div>
+
+    <div id="submitError" class="error-banner">
+      Erro ao submeter. Por favor tente novamente ou contacte eventos@navepadel.com
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(3)">← Voltar</button>
+      <button class="btn btn-primary" onclick="submitOrder()" id="btn-submit">
+        Submeter Pedido
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="section" id="section-success">
+    <div class="success-wrap">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Pedido recebido!</div>
+      <div class="success-sub">Entraremos em contacto em breve para confirmar os detalhes.</div>
+      <div class="order-ref" id="orderRef">REF: —</div>
+      <p style="font-size:13px;color:var(--grey);font-weight:300;">
+        Para questões: <strong>eventos@navepadel.com</strong>
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const CONFIG = {
+  fiberyWorkspace: 'navepadel',
+  fiberyToken: 'FIBERY_API_TOKEN', // replaced at setup
+  menuDataUrl: 'menu-data.json',
+  leadTimeDays: 5
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let state = {
+  menus: [],
+  selectedMenuId: null,
+  selectedMenu: null,
+  selections: {},   // courseId -> [dishIds]
+  currentStep: 1
+};
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(CONFIG.menuDataUrl);
+    if (!res.ok) throw new Error('Could not load menu data');
+    const data = await res.json();
+    state.menus = data.menus;
+    renderMenuCards();
+  } catch (e) {
+    document.getElementById('menuCards').innerHTML =
+      `<p style="color:var(--error);font-style:italic;">Erro ao carregar menus. Por favor recarregue a página.</p>`;
+  }
+}
+
+// ── RENDER MENU CARDS ─────────────────────────────────────────────────────────
+function renderMenuCards() {
+  const container = document.getElementById('menuCards');
+  container.innerHTML = state.menus
+    .filter(m => m.active)
+    .map(menu => `
+      <div class="menu-card" id="card-${menu.id}" onclick="selectMenu('${menu.id}')">
+        <div class="selected-check"></div>
+        <div class="menu-card-code">${menu.code}</div>
+        <div class="menu-card-name">${menu.name}</div>
+        <div class="menu-card-desc">${menu.description || ''}</div>
+        <div class="menu-card-price">${menu.pricePerPerson}€<span>por pessoa</span></div>
+        <div class="menu-card-min">Mínimo ${menu.minGuests} pessoas</div>
+      </div>
+    `).join('');
+}
+
+function selectMenu(id) {
+  state.selectedMenuId = id;
+  state.selectedMenu = state.menus.find(m => m.id === id);
+  state.selections = {};
+  document.querySelectorAll('.menu-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-' + id).classList.add('selected');
+}
+
+// ── RENDER COURSES ─────────────────────────────────────────────────────────────
+function renderCourses() {
+  const menu = state.selectedMenu;
+  document.getElementById('step2-heading').textContent = `Pratos — ${menu.name}`;
+  document.getElementById('step2-sub').textContent =
+    `${menu.pricePerPerson}€ por pessoa · ${menu.minGuests} pessoas mínimo`;
+
+  const container = document.getElementById('coursesContainer');
+  container.innerHTML = menu.courses
+    .filter(c => c.active !== false)
+    .sort((a,b) => a.displayOrder - b.displayOrder)
+    .map(course => `
+      <div class="course-block" id="course-block-${course.id}">
+        <div class="course-header">
+          <div>
+            <div class="course-name">${course.name}</div>
+            <div class="course-rule">${course.ruleLabel}</div>
+          </div>
+          <div class="course-status pending" id="status-${course.id}">Pendente</div>
+        </div>
+        <div class="dish-list">
+          ${course.dishes
+            .filter(d => d.active !== false)
+            .map(dish => `
+              <div class="dish-item" id="dish-${course.id}-${dish.id}"
+                   onclick="toggleDish('${course.id}', '${dish.id}', ${JSON.stringify(course)})">
+                <div class="dish-checkbox"></div>
+                <div class="dish-info">
+                  <div class="dish-name">${dish.name}</div>
+                  ${dish.description ? `<div class="dish-detail">${dish.description}</div>` : ''}
+                </div>
+              </div>
+            `).join('')}
+        </div>
+        <div class="validation-msg" id="val-${course.id}"></div>
+      </div>
+    `).join('');
+}
+
+// ── TOGGLE DISH SELECTION ──────────────────────────────────────────────────────
+function toggleDish(courseId, dishId, course) {
+  if (!state.selections[courseId]) state.selections[courseId] = [];
+  const sel = state.selections[courseId];
+  const idx = sel.indexOf(dishId);
+
+  const rule = course.selectionRule;    // 'choose_exactly' | 'choose_max' | 'choose_min'
+  const max = course.maxSelections;
+  const min = course.minSelections;
+
+  if (idx > -1) {
+    // Deselect
+    sel.splice(idx, 1);
+    document.getElementById(`dish-${courseId}-${dishId}`).classList.remove('selected');
+  } else {
+    // Select — enforce max
+    if (max && sel.length >= max) {
+      if (rule === 'choose_exactly' || rule === 'choose_max') {
+        // Replace last if exactly 1 allowed, else just block
+        if (max === 1) {
+          const old = sel[0];
+          document.getElementById(`dish-${courseId}-${old}`).classList.remove('selected');
+          sel.splice(0, 1);
+        } else {
+          return; // at max, can't add more
+        }
+      }
+    }
+    sel.push(dishId);
+    document.getElementById(`dish-${courseId}-${dishId}`).classList.add('selected');
+  }
+
+  updateCourseStatus(courseId, course);
+}
+
+function updateCourseStatus(courseId, course) {
+  const sel = state.selections[courseId] || [];
+  const n = sel.length;
+  const min = course.minSelections;
+  const max = course.maxSelections;
+  const rule = course.selectionRule;
+  const statusEl = document.getElementById('status-' + courseId);
+  const valEl = document.getElementById('val-' + courseId);
+
+  let valid = false;
+  let msg = '';
+
+  if (rule === 'choose_exactly') {
+    valid = n === min;
+    if (n < min) msg = `Escolha ${min - n} mais`;
+    else if (n > min) msg = `Escolha apenas ${min}`;
+  } else if (rule === 'choose_min') {
+    valid = n >= min;
+    if (!valid) msg = `Mínimo ${min} seleção(ões)`;
+  } else if (rule === 'choose_max') {
+    valid = n >= 1 && n <= max;
+    if (n === 0) msg = `Escolha pelo menos 1`;
+  } else if (rule === 'choose_range') {
+    valid = n >= min && n <= max;
+    if (n < min) msg = `Mínimo ${min} seleção(ões)`;
+  }
+
+  if (n === 0) {
+    statusEl.className = 'course-status pending';
+    statusEl.textContent = 'Pendente';
+    valEl.textContent = '';
+    valEl.classList.remove('visible');
+  } else if (valid) {
+    statusEl.className = 'course-status done';
+    statusEl.textContent = '✓ Ok';
+    valEl.textContent = '';
+    valEl.classList.remove('visible');
+  } else {
+    statusEl.className = 'course-status error';
+    statusEl.textContent = '!';
+    valEl.textContent = msg;
+    valEl.classList.add('visible');
+  }
+}
+
+function validateAllCourses() {
+  const menu = state.selectedMenu;
+  let allValid = true;
+
+  menu.courses.filter(c => c.active !== false).forEach(course => {
+    const sel = state.selections[course.id] || [];
+    const n = sel.length;
+    const min = course.minSelections;
+    const max = course.maxSelections;
+    const rule = course.selectionRule;
+
+    let valid = false;
+    if (rule === 'choose_exactly') valid = n === min;
+    else if (rule === 'choose_min') valid = n >= min;
+    else if (rule === 'choose_max') valid = n >= 1;
+    else if (rule === 'choose_range') valid = n >= min && n <= max;
+
+    if (!valid) {
+      allValid = false;
+      updateCourseStatus(course.id, course);
+    }
+  });
+
+  return allValid;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goToStep(step) {
+  // Validate current step before proceeding
+  if (step > state.currentStep) {
+    if (state.currentStep === 1 && !state.selectedMenuId) {
+      alert('Por favor selecione um menu.');
+      return;
+    }
+    if (state.currentStep === 2) {
+      if (!validateAllCourses()) {
+        document.getElementById('validationBanner').classList.add('visible');
+        return;
+      }
+      document.getElementById('validationBanner').classList.remove('visible');
+    }
+    if (state.currentStep === 3 && !validateEventForm()) return;
+  }
+
+  // Update steps UI
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step-' + i);
+    el.className = 'step';
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+
+  // Show correct section
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + step).classList.add('active');
+
+  state.currentStep = step;
+
+  if (step === 2) renderCourses();
+  if (step === 4) renderSummary();
+
+  window.scrollTo(0, 0);
+}
+
+// ── FORM VALIDATION ───────────────────────────────────────────────────────────
+function validateEventForm() {
+  let valid = true;
+
+  const name = document.getElementById('clientName').value.trim();
+  const email = document.getElementById('clientEmail').value.trim();
+  const phone = document.getElementById('clientPhone').value.trim();
+  const date = document.getElementById('eventDate').value;
+  const guests = parseInt(document.getElementById('guestCount').value);
+
+  // Name
+  setFieldError('clientName', 'err-name', !name);
+  if (!name) valid = false;
+
+  // Email
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  setFieldError('clientEmail', 'err-email', !emailOk);
+  if (!emailOk) valid = false;
+
+  // Phone
+  setFieldError('clientPhone', 'err-phone', !phone);
+  if (!phone) valid = false;
+
+  // Date — must be at least leadTimeDays in future
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() + CONFIG.leadTimeDays);
+  const dateOk = date && new Date(date) >= minDate;
+  setFieldError('eventDate', 'err-date', !dateOk);
+  if (!dateOk) valid = false;
+
+  // Guests — must meet menu minimum
+  const minGuests = state.selectedMenu?.minGuests || 1;
+  const guestsOk = guests && guests >= minGuests;
+  document.getElementById('err-guests').textContent =
+    `Mínimo ${minGuests} pessoas para este menu`;
+  setFieldError('guestCount', 'err-guests', !guestsOk);
+  if (!guestsOk) valid = false;
+
+  return valid;
+}
+
+function setFieldError(inputId, errId, hasError) {
+  const input = document.getElementById(inputId);
+  const err = document.getElementById(errId);
+  if (hasError) {
+    input.classList.add('error');
+    err.classList.add('visible');
+  } else {
+    input.classList.remove('error');
+    err.classList.remove('visible');
+  }
+}
+
+// ── RENDER SUMMARY ────────────────────────────────────────────────────────────
+function renderSummary() {
+  const menu = state.selectedMenu;
+  const guests = parseInt(document.getElementById('guestCount').value);
+  const total = menu.pricePerPerson * guests;
+
+  // Build selections display
+  let selectionsHtml = '';
+  menu.courses.filter(c => c.active !== false)
+    .sort((a,b) => a.displayOrder - b.displayOrder)
+    .forEach(course => {
+      const sel = state.selections[course.id] || [];
+      const dishNames = sel.map(did => {
+        const d = course.dishes.find(d => d.id === did);
+        return d ? d.name : did;
+      });
+      selectionsHtml += `
+        <div class="summary-row">
+          <div class="summary-label">${course.name}</div>
+          <div class="summary-value">${dishNames.join(', ') || '—'}</div>
+        </div>`;
+    });
+
+  const dateVal = document.getElementById('eventDate').value;
+  const dateFmt = dateVal ? new Date(dateVal + 'T12:00:00').toLocaleDateString('pt-PT', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  }) : '—';
+
+  document.getElementById('summaryContent').innerHTML = `
+    <div class="summary-block">
+      <div class="summary-header">
+        <div class="summary-header-title">Menu selecionado</div>
+        <div class="summary-header-value">${menu.name}</div>
+      </div>
+      ${selectionsHtml}
+    </div>
+
+    <div class="summary-block">
+      <div class="summary-header">
+        <div class="summary-header-title">Detalhes do evento</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-label">Cliente</div>
+        <div class="summary-value">${document.getElementById('clientName').value}
+          ${document.getElementById('clientCompany').value ? ' · ' + document.getElementById('clientCompany').value : ''}
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-label">Contacto</div>
+        <div class="summary-value">
+          ${document.getElementById('clientEmail').value} · ${document.getElementById('clientPhone').value}
+        </div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-label">Data</div>
+        <div class="summary-value">${dateFmt}</div>
+      </div>
+      <div class="summary-row">
+        <div class="summary-label">Pessoas</div>
+        <div class="summary-value">${guests}</div>
+      </div>
+      ${document.getElementById('eventNotes').value ? `
+      <div class="summary-row">
+        <div class="summary-label">Notas</div>
+        <div class="summary-value" style="font-style:italic;font-weight:300">${document.getElementById('eventNotes').value}</div>
+      </div>` : ''}
+      <div class="summary-price-row">
+        <div>
+          <div class="summary-price-label">Total estimado</div>
+          <div class="summary-price-note">${guests} pessoas × ${menu.pricePerPerson}€</div>
+        </div>
+        <div class="summary-price-value">${total.toFixed(2)}€</div>
+      </div>
+    </div>
+  `;
+}
+
+// ── SUBMIT ORDER ──────────────────────────────────────────────────────────────
+async function submitOrder() {
+  const menu = state.selectedMenu;
+  const guests = parseInt(document.getElementById('guestCount').value);
+
+  // Build selections summary
+  const selectionsData = {};
+  menu.courses.forEach(course => {
+    const sel = state.selections[course.id] || [];
+    selectionsData[course.name] = sel.map(did => {
+      const d = course.dishes.find(d => d.id === did);
+      return d ? d.name : did;
+    });
+  });
+
+  const orderPayload = {
+    clientName: document.getElementById('clientName').value.trim(),
+    clientEmail: document.getElementById('clientEmail').value.trim(),
+    clientPhone: document.getElementById('clientPhone').value.trim(),
+    clientCompany: document.getElementById('clientCompany').value.trim(),
+    eventDate: document.getElementById('eventDate').value,
+    guestCount: guests,
+    notes: document.getElementById('eventNotes').value.trim(),
+    menuId: menu.id,
+    menuName: menu.name,
+    pricePerPerson: menu.pricePerPerson,
+    totalEstimate: menu.pricePerPerson * guests,
+    selections: JSON.stringify(selectionsData),
+    status: 'New',
+    submittedAt: new Date().toISOString()
+  };
+
+  document.getElementById('loadingOverlay').classList.add('visible');
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('submitError').classList.remove('visible');
+
+  try {
+    const result = await createFiberyOrder(orderPayload);
+    document.getElementById('loadingOverlay').classList.remove('visible');
+
+    // Show success
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-success').classList.add('active');
+    document.getElementById('orderRef').textContent = 'REF: ' + generateRef();
+    window.scrollTo(0, 0);
+
+  } catch (e) {
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    document.getElementById('btn-submit').disabled = false;
+    document.getElementById('submitError').classList.add('visible');
+    console.error('Submit error:', e);
+  }
+}
+
+// ── FIBERY API ────────────────────────────────────────────────────────────────
+async function createFiberyOrder(order) {
+  const url = `https://${CONFIG.fiberyWorkspace}.fibery.io/api/commands`;
+
+  const body = JSON.stringify([{
+    command: 'fibery.entity/create',
+    args: {
+      type: 'Catering/Orders',
+      entity: {
+        'Catering/Client Name': order.clientName,
+        'Catering/Client Email': order.clientEmail,
+        'Catering/Client Phone': order.clientPhone,
+        'Catering/Company': order.clientCompany,
+        'Catering/Event Date': order.eventDate,
+        'Catering/Guest Count': order.guestCount,
+        'Catering/Notes': order.notes,
+        'Catering/Menu Name': order.menuName,
+        'Catering/Price Per Person': order.pricePerPerson,
+        'Catering/Total Estimate': order.totalEstimate,
+        'Catering/Selections': order.selections,
+        'Catering/Status': order.status,
+        'fibery/name': `${order.clientName} — ${order.eventDate}`
+      }
+    }
+  }]);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Token ${CONFIG.fiberyToken}`
+    },
+    body
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Fibery error ${response.status}: ${text}`);
+  }
+
+  return await response.json();
+}
+
+function generateRef() {
+  const d = new Date();
+  return `NAVE-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${Math.random().toString(36).substr(2,5).toUpperCase()}`;
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
