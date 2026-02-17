@@ -9,8 +9,14 @@
 <meta property="og:title" content="NAVE — Catering para Eventos">
 <meta property="og:description" content="Menus completos para eventos no NAVE Academy. Padel × Pickleball.">
 <meta property="og:image" content="https://navepadel.github.io/nave-menu/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://navepadel.github.io/nave-menu/">
 <meta property="og:type" content="website">
+
+<!-- Apple / iMessage -->
+<meta name="apple-mobile-web-app-title" content="NAVE Catering">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
@@ -1725,6 +1731,34 @@ async function submitOrder() {
     }
   });
 
+  // Format selections as readable text
+  function formatSelections(data) {
+    let text = '';
+    Object.keys(data).forEach(courseName => {
+      text += courseName.toUpperCase() + '\n';
+      const courseData = data[courseName];
+      
+      if (typeof courseData === 'string') {
+        // choose_one
+        text += '• ' + courseData + '\n';
+      } else if (Array.isArray(courseData)) {
+        // choose_many
+        courseData.forEach(dish => {
+          text += '• ' + dish + '\n';
+        });
+      } else if (typeof courseData === 'object') {
+        // choose_split
+        Object.keys(courseData).forEach(subcatName => {
+          const subcat = courseData[subcatName];
+          text += '  ' + subcatName + ' (' + subcat.qty + ' pessoas)\n';
+          text += '  • ' + subcat.dish + '\n';
+        });
+      }
+      text += '\n';
+    });
+    return text.trim();
+  }
+
   const orderRef = generateRef();
   
   const payload = {
@@ -1739,7 +1773,7 @@ async function submitOrder() {
     menuName:       menu.name,
     pricePerPerson: menu.pricePerPerson,
     totalEstimate:  menu.pricePerPerson * g,
-    selections:     JSON.stringify(selectionsData),
+    selections:     formatSelections(selectionsData),
     status:         'New'
   };
 
