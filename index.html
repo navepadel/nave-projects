@@ -46,7 +46,7 @@
   }
   
   .logo-img {
-    height: 70px;
+    height: 45px;
     width: auto;
   }
 
@@ -758,7 +758,17 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
-    header { padding: 20px 20px; }
+    header { 
+      padding: 20px 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .logo-img { height: 35px; }
+    .header-label {
+      text-align: left;
+      font-size: 9px;
+    }
     .progress-bar { padding: 0 20px 20px; }
     main { padding: 32px 16px 60px; }
     .form-grid { grid-template-columns: 1fr; }
@@ -766,7 +776,64 @@
     .btn-row { flex-direction: column; }
     .btn { width: 100%; text-align: center; }
   }
+  /* ── PRINT STYLES ── */
+  @media print {
+    /* Reduce logo size */
+    .logo-img {
+      height: 30px !important;
+    }
+    
+    /* Hide progress bar */
+    .progress-bar {
+      display: none !important;
+    }
+    
+    /* Hide section headers */
+    .section-title,
+    .section-heading,
+    .section-sub {
+      display: none !important;
+    }
+    
+    /* Hide buttons */
+    .btn-row {
+      display: none !important;
+    }
+    
+    /* Optimize layout */
+    header {
+      padding: 15px 20px !important;
+      page-break-after: avoid;
+    }
+    
+    .section {
+      padding: 10px 20px !important;
+    }
+    
+    /* Ensure summary blocks stay together */
+    .summary-block {
+      page-break-inside: avoid;
+    }
+    
+    /* Success section */
+    #section-success {
+      page-break-before: avoid;
+      margin-top: 20px !important;
+    }
+    
+    /* Better contrast for B&W printing */
+    .success-icon {
+      border-color: #000 !important;
+      color: #000 !important;
+    }
+    
+    .order-ref {
+      border-color: #000 !important;
+      background: #f0f0f0 !important;
+    }
+  }
 </style>
+
 </head>
 <body>
 
