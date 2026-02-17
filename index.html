@@ -352,6 +352,11 @@
     color: var(--black);
     margin-bottom: 2px;
   }
+  
+  .veg-icon {
+    font-size: 14px;
+    margin-left: 6px;
+  }
 
   .dish-detail {
     font-size: 12px;
@@ -1106,7 +1111,8 @@ function transformCourse(c) {
     id: d['fibery/id'],
     name: d['Catering/Name'],
     description: d['Catering/Description'] || '',
-    mandatory: d['Catering/Mandatory'] || false
+    mandatory: d['Catering/Mandatory'] || false,
+    vegetarian: d['Catering/Vegetarian'] || false
   }));
 
   return base;
@@ -1188,10 +1194,11 @@ function renderStandardCourse(course) {
   course.dishes.forEach(dish => {
     const mandatory = dish.mandatory ? ' mandatory' : '';
     const checkbox = dish.mandatory ? '<div class="dish-checkbox mandatory-check">✓</div>' : '<div class="dish-checkbox"></div>';
+    const vegIcon = dish.vegetarian ? ' <span class="veg-icon">🌱</span>' : '';
     html += '<div class="dish-item' + mandatory + '" id="dish-' + course.id + '-' + dish.id + '">'
       + checkbox
       + '<div class="dish-info">'
-      + '<div class="dish-name">' + dish.name + '</div>'
+      + '<div class="dish-name">' + dish.name + vegIcon + '</div>'
       + (dish.description ? '<div class="dish-detail">' + dish.description + '</div>' : '')
       + '</div></div>';
   });
@@ -1209,10 +1216,11 @@ function renderSplitCourse(course, guests) {
       + '<div class="dish-list">';
 
     subcat.dishes.forEach(dish => {
+      const vegIcon = dish.vegetarian ? ' <span class="veg-icon">🌱</span>' : '';
       html += '<div class="dish-item" id="dish-' + subcat.id + '-' + dish.id + '">'
         + '<div class="dish-checkbox"></div>'
         + '<div class="dish-info">'
-        + '<div class="dish-name">' + dish.name + '</div>'
+        + '<div class="dish-name">' + dish.name + vegIcon + '</div>'
         + (dish.description ? '<div class="dish-detail">' + dish.description + '</div>' : '')
         + '</div></div>';
     });
