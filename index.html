@@ -625,6 +625,109 @@
 
   .error-banner.visible { display: block; }
 
+  /* ── GUEST COUNT ROW ── */
+  .guest-count-row {
+    margin: 32px 0 0;
+    padding: 24px 28px;
+    background: var(--white);
+    border: 1.5px solid var(--cream-dark);
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+  }
+
+  .guest-count-row .form-group { margin: 0; }
+
+  /* ── SPLIT COURSE ── */
+  .split-course {
+    border-top: 1px solid var(--cream-dark);
+  }
+
+  .subcat-block {
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .subcat-block:last-of-type {
+    border-bottom: none;
+  }
+
+  .subcat-header {
+    padding: 10px 24px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--verde);
+    background: var(--cream);
+    border-bottom: 1px solid var(--cream-dark);
+  }
+
+  .split-qty-row {
+    padding: 10px 24px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--cream);
+    border-top: 1px solid var(--cream-dark);
+  }
+
+  .split-qty-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grey);
+    flex-shrink: 0;
+  }
+
+  .split-qty-input {
+    width: 80px;
+    padding: 6px 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--black);
+    border: 1.5px solid var(--cream-dark);
+    background: var(--white);
+    text-align: center;
+  }
+
+  .split-qty-input:focus {
+    border-color: var(--ocre);
+    outline: none;
+  }
+
+  .split-qty-input:disabled {
+    opacity: 0.35;
+    background: var(--cream-dark);
+  }
+
+  .split-total-bar {
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--black);
+    border-top: 2px solid var(--cream-dark);
+  }
+
+  .split-total-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .split-total-count {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--grey);
+    transition: color 0.2s;
+  }
+
+  .split-total-bar.exact .split-total-count { color: var(--verde); }
+  .split-total-bar.over  .split-total-count { color: var(--error); }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     header { padding: 20px 20px; }
@@ -680,6 +783,15 @@
     <div class="section-sub">Todos os menus incluem couvert, prato de sopa, prato principal e sobremesa.</div>
 
     <div class="menu-cards" id="menuCards"></div>
+
+    <div class="guest-count-row">
+      <div class="form-group" style="max-width:220px">
+        <label>Nº de Pessoas *</label>
+        <input type="number" id="guestCount" placeholder="Mínimo 20" min="1"
+               oninput="onGuestCountChange()">
+        <div class="field-error" id="err-guests">Verifique o número mínimo de pessoas</div>
+      </div>
+    </div>
 
     <div class="btn-row">
       <button class="btn btn-primary" onclick="goToStep(2)" id="btn-step1">
@@ -737,11 +849,6 @@
         <input type="date" id="eventDate">
         <div class="field-error" id="err-date">Data inválida (mínimo 5 dias de antecedência)</div>
       </div>
-      <div class="form-group">
-        <label>Nº de Pessoas *</label>
-        <input type="number" id="guestCount" placeholder="Mínimo 20" min="1">
-        <div class="field-error" id="err-guests">Verifique o número mínimo de pessoas</div>
-      </div>
       <div class="form-group full">
         <label>Notas adicionais</label>
         <textarea id="eventNotes" placeholder="Alergias, preferências, pedidos especiais..."></textarea>
@@ -793,9 +900,100 @@
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const CONFIG = {
   fiberyWorkspace: 'navepadel',
-  fiberyToken: 'FIBERY_API_TOKEN', // replaced at setup
-  menuDataUrl: 'menu-data.json',
+  fiberyToken: 'FIBERY_API_TOKEN',
   leadTimeDays: 5
+};
+
+// ── MENU DATA ─────────────────────────────────────────────────────────────────
+const MENU_DATA = {
+  "menus": [
+    {
+      "id": "mb1",
+      "code": "Menu MB 1",
+      "name": "Menu MB 1",
+      "description": "Menu de evento completo com sopas, prato principal e sobremesa.",
+      "pricePerPerson": 30,
+      "minGuests": 20,
+      "active": true,
+      "courses": [
+        {
+          "id": "mb1-entradas",
+          "name": "ENTRADAS",
+          "displayOrder": 1,
+          "selectionRule": "choose_many",
+          "count": 2,
+          "ruleLabel": "1 couvert + escolha 2 entradas",
+          "active": true,
+          "dishes": [
+            { "id": "d-azeitonas",   "name": "Azeitonas temperadas",    "description": "" },
+            { "id": "d-humus",       "name": "H\u00FAmus de beterraba",        "description": "" },
+            { "id": "d-pasta-cabra", "name": "Pasta de queijo de cabra", "description": "" }
+          ]
+        },
+        {
+          "id": "mb1-sopas",
+          "name": "SOPAS",
+          "displayOrder": 2,
+          "selectionRule": "choose_one",
+          "ruleLabel": "escolha 1 para todo o grupo",
+          "active": true,
+          "dishes": [
+            { "id": "d-sopa-cebola",   "name": "Sopa de cebola com Mozzarella",      "description": "" },
+            { "id": "d-creme-tomate",  "name": "Creme de tomate com chouri\u00E7o assado", "description": "" },
+            { "id": "d-creme-broculos","name": "Creme de Br\u00F3colos",               "description": "vegetariano" }
+          ]
+        },
+        {
+          "id": "mb1-principal",
+          "name": "PRATO PRINCIPAL",
+          "displayOrder": 3,
+          "selectionRule": "choose_split",
+          "minPct": 25,
+          "ruleLabel": "1 prato por categoria \u00B7 quantidades somam total de pessoas",
+          "active": true,
+          "subcategories": [
+            {
+              "id": "mb1-veg",
+              "name": "VEGETARIANO",
+              "dishes": [
+                { "id": "d-alho-frances",      "name": "Alho Fran\u00EAs \u00E0 Br\u00E1s",   "description": "com salada de tomate e manjeric\u00E3o" },
+                { "id": "d-lasanha-espinafres", "name": "Lasanha de Espinafres", "description": "com salada de couve cora\u00E7\u00E3o" }
+              ]
+            },
+            {
+              "id": "mb1-peixe",
+              "name": "PEIXE",
+              "dishes": [
+                { "id": "d-bacalhau-broa",   "name": "Bacalhau com Broa e Espinafres", "description": "com salada de alface branca" },
+                { "id": "d-gratinado-peixe", "name": "Gratinado de peixe e cogumelos", "description": "com arroz de coentros" }
+              ]
+            },
+            {
+              "id": "mb1-carnes",
+              "name": "CARNES",
+              "dishes": [
+                { "id": "d-escalopes-frango", "name": "Escalopes de Frango Braseados", "description": "em molho de mostarda, pera assada e espinafres" },
+                { "id": "d-rolo-carne",       "name": "Rolo de carne misto",           "description": "com massinha de molho de cogumelos" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mb1-sobremesas",
+          "name": "SOBREMESAS",
+          "displayOrder": 4,
+          "selectionRule": "choose_one",
+          "ruleLabel": "escolha 1 para todo o grupo",
+          "active": true,
+          "dishes": [
+            { "id": "d-cremana",      "name": "Cremana com frutas da \u00E9poca", "description": "creme de natas, hort\u00E3 e a\u00E7\u00FAcar" },
+            { "id": "d-pao-lo",       "name": "P\u00E3o de l\u00F3 mergulhado",         "description": "em leite creme e canela" },
+            { "id": "d-iogurte-grego","name": "Doce de iogurte Grego",    "description": "com frutos silvestres e suspiros" }
+          ]
+        }
+      ]
+    }
+  ]
 };
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
@@ -803,22 +1001,18 @@ let state = {
   menus: [],
   selectedMenuId: null,
   selectedMenu: null,
-  selections: {},   // courseId -> [dishIds]
+  // selections structure depends on course rule:
+  //   choose_one:   courseId -> dishId (string)
+  //   choose_many:  courseId -> [dishId, ...]
+  //   choose_split: courseId -> { subcatId: { dishId, qty } }
+  selections: {},
   currentStep: 1
 };
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-async function init() {
-  try {
-    const res = await fetch(CONFIG.menuDataUrl);
-    if (!res.ok) throw new Error('Could not load menu data');
-    const data = await res.json();
-    state.menus = data.menus;
-    renderMenuCards();
-  } catch (e) {
-    document.getElementById('menuCards').innerHTML =
-      `<p style="color:var(--error);font-style:italic;">Erro ao carregar menus. Por favor recarregue a página.</p>`;
-  }
+function init() {
+  state.menus = MENU_DATA.menus;
+  renderMenuCards();
 }
 
 // ── RENDER MENU CARDS ─────────────────────────────────────────────────────────
@@ -826,16 +1020,15 @@ function renderMenuCards() {
   const container = document.getElementById('menuCards');
   container.innerHTML = state.menus
     .filter(m => m.active)
-    .map(menu => `
-      <div class="menu-card" id="card-${menu.id}" onclick="selectMenu('${menu.id}')">
-        <div class="selected-check"></div>
-        <div class="menu-card-code">${menu.code}</div>
-        <div class="menu-card-name">${menu.name}</div>
-        <div class="menu-card-desc">${menu.description || ''}</div>
-        <div class="menu-card-price">${menu.pricePerPerson}€<span>por pessoa</span></div>
-        <div class="menu-card-min">Mínimo ${menu.minGuests} pessoas</div>
-      </div>
-    `).join('');
+    .map(m => '<div class="menu-card" id="card-' + m.id + '" onclick="selectMenu(\'' + m.id + '\')">'
+      + '<div class="selected-check"></div>'
+      + '<div class="menu-card-code">' + m.code + '</div>'
+      + '<div class="menu-card-name">' + m.name + '</div>'
+      + '<div class="menu-card-desc">' + (m.description || '') + '</div>'
+      + '<div class="menu-card-price">' + m.pricePerPerson + '\u20AC<span>por pessoa</span></div>'
+      + '<div class="menu-card-min">M\u00EDnimo ' + m.minGuests + ' pessoas</div>'
+      + '</div>'
+    ).join('');
 }
 
 function selectMenu(id) {
@@ -849,112 +1042,253 @@ function selectMenu(id) {
 // ── RENDER COURSES ─────────────────────────────────────────────────────────────
 function renderCourses() {
   const menu = state.selectedMenu;
-  document.getElementById('step2-heading').textContent = `Pratos — ${menu.name}`;
+  const guests = parseInt(document.getElementById('guestCount').value) || menu.minGuests;
+
+  document.getElementById('step2-heading').textContent = 'Pratos \u2014 ' + menu.name;
   document.getElementById('step2-sub').textContent =
-    `${menu.pricePerPerson}€ por pessoa · ${menu.minGuests} pessoas mínimo`;
+    menu.pricePerPerson + '\u20AC por pessoa \u00B7 ' + guests + ' pessoas';
 
   const container = document.getElementById('coursesContainer');
-  container.innerHTML = menu.courses
-    .filter(c => c.active !== false)
-    .sort((a,b) => a.displayOrder - b.displayOrder)
-    .map(course => `
-      <div class="course-block" id="course-block-${course.id}">
-        <div class="course-header">
-          <div>
-            <div class="course-name">${course.name}</div>
-            <div class="course-rule">${course.ruleLabel}</div>
-          </div>
-          <div class="course-status pending" id="status-${course.id}">Pendente</div>
-        </div>
-        <div class="dish-list">
-          ${course.dishes
-            .filter(d => d.active !== false)
-            .map(dish => `
-              <div class="dish-item" id="dish-${course.id}-${dish.id}"
-                   onclick="toggleDish('${course.id}', '${dish.id}', ${JSON.stringify(course)})">
-                <div class="dish-checkbox"></div>
-                <div class="dish-info">
-                  <div class="dish-name">${dish.name}</div>
-                  ${dish.description ? `<div class="dish-detail">${dish.description}</div>` : ''}
-                </div>
-              </div>
-            `).join('')}
-        </div>
-        <div class="validation-msg" id="val-${course.id}"></div>
-      </div>
-    `).join('');
-}
+  let html = '';
 
-// ── TOGGLE DISH SELECTION ──────────────────────────────────────────────────────
-function toggleDish(courseId, dishId, course) {
-  if (!state.selections[courseId]) state.selections[courseId] = [];
-  const sel = state.selections[courseId];
-  const idx = sel.indexOf(dishId);
+  menu.courses.filter(c => c.active !== false)
+    .sort((a, b) => a.displayOrder - b.displayOrder)
+    .forEach(course => {
+      html += '<div class="course-block" id="course-block-' + course.id + '">'
+        + '<div class="course-header">'
+        + '<div><div class="course-name">' + course.name + '</div>'
+        + '<div class="course-rule">' + course.ruleLabel + '</div></div>'
+        + '<div class="course-status pending" id="status-' + course.id + '">Pendente</div>'
+        + '</div>';
 
-  const rule = course.selectionRule;    // 'choose_exactly' | 'choose_max' | 'choose_min'
-  const max = course.maxSelections;
-  const min = course.minSelections;
-
-  if (idx > -1) {
-    // Deselect
-    sel.splice(idx, 1);
-    document.getElementById(`dish-${courseId}-${dishId}`).classList.remove('selected');
-  } else {
-    // Select — enforce max
-    if (max && sel.length >= max) {
-      if (rule === 'choose_exactly' || rule === 'choose_max') {
-        // Replace last if exactly 1 allowed, else just block
-        if (max === 1) {
-          const old = sel[0];
-          document.getElementById(`dish-${courseId}-${old}`).classList.remove('selected');
-          sel.splice(0, 1);
-        } else {
-          return; // at max, can't add more
-        }
+      if (course.selectionRule === 'choose_split') {
+        html += renderSplitCourse(course, guests);
+      } else {
+        html += renderStandardCourse(course);
       }
-    }
-    sel.push(dishId);
-    document.getElementById(`dish-${courseId}-${dishId}`).classList.add('selected');
-  }
 
-  updateCourseStatus(courseId, course);
+      html += '<div class="validation-msg" id="val-' + course.id + '"></div>'
+        + '</div>';
+    });
+
+  container.innerHTML = html;
+  attachCourseHandlers(menu, guests);
 }
 
-function updateCourseStatus(courseId, course) {
-  const sel = state.selections[courseId] || [];
-  const n = sel.length;
-  const min = course.minSelections;
-  const max = course.maxSelections;
+// ── RENDER STANDARD COURSE (choose_one / choose_many) ─────────────────────────
+function renderStandardCourse(course) {
+  let html = '<div class="dish-list">';
+  course.dishes.forEach(dish => {
+    html += '<div class="dish-item" id="dish-' + course.id + '-' + dish.id + '">'
+      + '<div class="dish-checkbox"></div>'
+      + '<div class="dish-info">'
+      + '<div class="dish-name">' + dish.name + '</div>'
+      + (dish.description ? '<div class="dish-detail">' + dish.description + '</div>' : '')
+      + '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── RENDER SPLIT COURSE (choose_split) ────────────────────────────────────────
+function renderSplitCourse(course, guests) {
+  let html = '<div class="split-course">';
+
+  course.subcategories.forEach(subcat => {
+    html += '<div class="subcat-block" id="subcat-' + subcat.id + '">'
+      + '<div class="subcat-header">' + subcat.name + '</div>'
+      + '<div class="dish-list">';
+
+    subcat.dishes.forEach(dish => {
+      html += '<div class="dish-item" id="dish-' + subcat.id + '-' + dish.id + '">'
+        + '<div class="dish-checkbox"></div>'
+        + '<div class="dish-info">'
+        + '<div class="dish-name">' + dish.name + '</div>'
+        + (dish.description ? '<div class="dish-detail">' + dish.description + '</div>' : '')
+        + '</div></div>';
+    });
+
+    html += '</div>'
+      // Qty row — always shown, disabled until a dish is selected
+      + '<div class="split-qty-row" id="qty-row-' + subcat.id + '">'
+      + '<span class="split-qty-label">N\u00BA de pessoas</span>'
+      + '<input type="number" class="split-qty-input" id="qty-' + subcat.id
+      + '" min="0" max="' + guests + '" value="0" disabled '
+      + 'oninput="onQtyInput(\'' + course.id + '\', \'' + subcat.id + '\')">'
+      + '</div>'
+      + '</div>';
+  });
+
+  // Running total bar
+  html += '<div class="split-total-bar" id="split-total-' + course.id + '">'
+    + '<span class="split-total-label">Total</span>'
+    + '<span class="split-total-count"><span id="split-count-' + course.id + '">0</span> / ' + guests + '</span>'
+    + '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+// ── ATTACH HANDLERS ──────────────────────────────────────────────────────────
+function attachCourseHandlers(menu, guests) {
+  menu.courses.filter(c => c.active !== false).forEach(course => {
+    if (course.selectionRule === 'choose_split') {
+      course.subcategories.forEach(subcat => {
+        subcat.dishes.forEach(dish => {
+          const el = document.getElementById('dish-' + subcat.id + '-' + dish.id);
+          if (el) el.onclick = () => toggleSplitDish(course, subcat, dish.id, guests);
+        });
+      });
+    } else {
+      course.dishes.forEach(dish => {
+        const el = document.getElementById('dish-' + course.id + '-' + dish.id);
+        if (el) el.onclick = () => toggleStandardDish(course, dish.id);
+      });
+    }
+  });
+}
+
+// ── TOGGLE STANDARD DISH ─────────────────────────────────────────────────────
+function toggleStandardDish(course, dishId) {
   const rule = course.selectionRule;
-  const statusEl = document.getElementById('status-' + courseId);
-  const valEl = document.getElementById('val-' + courseId);
+  const count = course.count || 1;
 
-  let valid = false;
-  let msg = '';
-
-  if (rule === 'choose_exactly') {
-    valid = n === min;
-    if (n < min) msg = `Escolha ${min - n} mais`;
-    else if (n > min) msg = `Escolha apenas ${min}`;
-  } else if (rule === 'choose_min') {
-    valid = n >= min;
-    if (!valid) msg = `Mínimo ${min} seleção(ões)`;
-  } else if (rule === 'choose_max') {
-    valid = n >= 1 && n <= max;
-    if (n === 0) msg = `Escolha pelo menos 1`;
-  } else if (rule === 'choose_range') {
-    valid = n >= min && n <= max;
-    if (n < min) msg = `Mínimo ${min} seleção(ões)`;
+  if (rule === 'choose_one') {
+    // Deselect previous
+    const prev = state.selections[course.id];
+    if (prev) document.getElementById('dish-' + course.id + '-' + prev).classList.remove('selected');
+    // Select new (or deselect if same)
+    if (prev === dishId) {
+      delete state.selections[course.id];
+    } else {
+      state.selections[course.id] = dishId;
+      document.getElementById('dish-' + course.id + '-' + dishId).classList.add('selected');
+    }
+  } else if (rule === 'choose_many') {
+    if (!state.selections[course.id]) state.selections[course.id] = [];
+    const sel = state.selections[course.id];
+    const idx = sel.indexOf(dishId);
+    if (idx > -1) {
+      sel.splice(idx, 1);
+      document.getElementById('dish-' + course.id + '-' + dishId).classList.remove('selected');
+    } else {
+      if (sel.length >= count) return; // at max, block
+      sel.push(dishId);
+      document.getElementById('dish-' + course.id + '-' + dishId).classList.add('selected');
+    }
   }
 
-  if (n === 0) {
+  updateCourseStatus(course, guests());
+}
+
+// ── TOGGLE SPLIT DISH ────────────────────────────────────────────────────────
+function toggleSplitDish(course, subcat, dishId, guests) {
+  if (!state.selections[course.id]) state.selections[course.id] = {};
+  const subcatSel = state.selections[course.id][subcat.id] || {};
+
+  const prevDish = subcatSel.dishId;
+
+  if (prevDish === dishId) {
+    // Deselect — clear this subcategory
+    delete state.selections[course.id][subcat.id];
+    document.getElementById('dish-' + subcat.id + '-' + dishId).classList.remove('selected');
+    const qtyInput = document.getElementById('qty-' + subcat.id);
+    qtyInput.value = 0;
+    qtyInput.disabled = true;
+  } else {
+    // Deselect previous dish in this subcat if any
+    if (prevDish) {
+      document.getElementById('dish-' + subcat.id + '-' + prevDish).classList.remove('selected');
+    }
+    // Select new dish
+    state.selections[course.id][subcat.id] = { dishId: dishId, qty: subcatSel.qty || 0 };
+    document.getElementById('dish-' + subcat.id + '-' + dishId).classList.add('selected');
+    const qtyInput = document.getElementById('qty-' + subcat.id);
+    qtyInput.disabled = false;
+    qtyInput.focus();
+  }
+
+  updateSplitTotal(course, guests);
+  updateCourseStatus(course, guests);
+}
+
+// ── QTY INPUT HANDLER ─────────────────────────────────────────────────────────
+function onQtyInput(courseId, subcatId) {
+  const val = parseInt(document.getElementById('qty-' + subcatId).value) || 0;
+  if (!state.selections[courseId]) state.selections[courseId] = {};
+  if (!state.selections[courseId][subcatId]) state.selections[courseId][subcatId] = {};
+  state.selections[courseId][subcatId].qty = val;
+
+  const course = state.selectedMenu.courses.find(c => c.id === courseId);
+  const g = guests();
+  updateSplitTotal(course, g);
+  updateCourseStatus(course, g);
+}
+
+function updateSplitTotal(course, guests) {
+  const sel = state.selections[course.id] || {};
+  const total = Object.values(sel).reduce((sum, s) => sum + (s.qty || 0), 0);
+  const el = document.getElementById('split-count-' + course.id);
+  const bar = document.getElementById('split-total-' + course.id);
+  if (el) el.textContent = total;
+  if (bar) {
+    bar.classList.toggle('over',  total > guests);
+    bar.classList.toggle('exact', total === guests);
+  }
+}
+
+// ── COURSE STATUS ─────────────────────────────────────────────────────────────
+function updateCourseStatus(course, guests) {
+  const statusEl = document.getElementById('status-' + course.id);
+  const valEl    = document.getElementById('val-' + course.id);
+  const rule     = course.selectionRule;
+  let valid = false, msg = '';
+
+  if (rule === 'choose_one') {
+    valid = !!state.selections[course.id];
+    if (!valid) msg = 'Selecione 1 prato';
+
+  } else if (rule === 'choose_many') {
+    const sel = state.selections[course.id] || [];
+    const n = sel.length;
+    const count = course.count || 1;
+    valid = n === count;
+    if (n < count) msg = 'Escolha ' + (count - n) + ' mais';
+    else if (n > count) msg = 'Escolha apenas ' + count;
+
+  } else if (rule === 'choose_split') {
+    const sel = state.selections[course.id] || {};
+    const total = Object.values(sel).reduce((s, v) => s + (v.qty || 0), 0);
+    const minQty = Math.ceil(guests * (course.minPct / 100));
+
+    // Each subcategory: either 0 (not selected) or dish selected + qty >= minQty
+    let subcatErrors = [];
+    course.subcategories.forEach(subcat => {
+      const s = sel[subcat.id];
+      if (s) {
+        if (!s.dishId) subcatErrors.push(subcat.name + ': escolha um prato');
+        else if (s.qty < minQty) subcatErrors.push(subcat.name + ': m\u00EDnimo ' + minQty + ' pessoas');
+      }
+    });
+
+    const anySelected = Object.keys(sel).length > 0;
+    valid = anySelected && total === guests && subcatErrors.length === 0;
+
+    if (!anySelected) msg = 'Selecione pelo menos 1 categoria';
+    else if (subcatErrors.length) msg = subcatErrors.join(' \u00B7 ');
+    else if (total !== guests) msg = 'Total: ' + total + ' de ' + guests + ' pessoas';
+  }
+
+  if (!state.selections[course.id] ||
+      (Array.isArray(state.selections[course.id]) && state.selections[course.id].length === 0) ||
+      (typeof state.selections[course.id] === 'object' && !Array.isArray(state.selections[course.id]) && Object.keys(state.selections[course.id]).length === 0)) {
     statusEl.className = 'course-status pending';
     statusEl.textContent = 'Pendente';
     valEl.textContent = '';
     valEl.classList.remove('visible');
   } else if (valid) {
     statusEl.className = 'course-status done';
-    statusEl.textContent = '✓ Ok';
+    statusEl.textContent = '\u2713 Ok';
     valEl.textContent = '';
     valEl.classList.remove('visible');
   } else {
@@ -965,39 +1299,33 @@ function updateCourseStatus(courseId, course) {
   }
 }
 
+// Helper — get current guest count from the form
+function guests() {
+  return parseInt(document.getElementById('guestCount').value) || (state.selectedMenu && state.selectedMenu.minGuests) || 20;
+}
+
+// ── VALIDATE ALL COURSES ──────────────────────────────────────────────────────
 function validateAllCourses() {
   const menu = state.selectedMenu;
+  const g = guests();
   let allValid = true;
-
   menu.courses.filter(c => c.active !== false).forEach(course => {
-    const sel = state.selections[course.id] || [];
-    const n = sel.length;
-    const min = course.minSelections;
-    const max = course.maxSelections;
-    const rule = course.selectionRule;
-
-    let valid = false;
-    if (rule === 'choose_exactly') valid = n === min;
-    else if (rule === 'choose_min') valid = n >= min;
-    else if (rule === 'choose_max') valid = n >= 1;
-    else if (rule === 'choose_range') valid = n >= min && n <= max;
-
-    if (!valid) {
-      allValid = false;
-      updateCourseStatus(course.id, course);
-    }
+    updateCourseStatus(course, g);
+    const statusEl = document.getElementById('status-' + course.id);
+    if (!statusEl.classList.contains('done')) allValid = false;
   });
-
   return allValid;
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
 function goToStep(step) {
-  // Validate current step before proceeding
   if (step > state.currentStep) {
-    if (state.currentStep === 1 && !state.selectedMenuId) {
-      alert('Por favor selecione um menu.');
-      return;
+    if (state.currentStep === 1) {
+      if (!state.selectedMenuId) {
+        alert('Por favor selecione um menu.');
+        return;
+      }
+      if (!validateGuestCount()) return;
     }
     if (state.currentStep === 2) {
       if (!validateAllCourses()) {
@@ -1009,7 +1337,6 @@ function goToStep(step) {
     if (state.currentStep === 3 && !validateEventForm()) return;
   }
 
-  // Update steps UI
   for (let i = 1; i <= 4; i++) {
     const el = document.getElementById('step-' + i);
     el.className = 'step';
@@ -1017,178 +1344,186 @@ function goToStep(step) {
     else if (i === step) el.classList.add('active');
   }
 
-  // Show correct section
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('section-' + step).classList.add('active');
-
   state.currentStep = step;
 
   if (step === 2) renderCourses();
   if (step === 4) renderSummary();
-
   window.scrollTo(0, 0);
+}
+
+// ── GUEST COUNT VALIDATION ───────────────────────────────────────────────
+function validateGuestCount() {
+  const val = parseInt(document.getElementById('guestCount').value);
+  const minGuests = state.selectedMenu ? state.selectedMenu.minGuests : 1;
+  const ok = val && val >= minGuests;
+  document.getElementById('err-guests').textContent = 'Mínimo ' + minGuests + ' pessoas para este menu';
+  setFieldError('guestCount', 'err-guests', !ok);
+  return ok;
+}
+
+function onGuestCountChange() {
+  if (state.selectedMenu) validateGuestCount();
+  // If already on step 2, re-render courses with new count
+  if (state.currentStep === 2) {
+    state.selections = {};
+    renderCourses();
+  }
 }
 
 // ── FORM VALIDATION ───────────────────────────────────────────────────────────
 function validateEventForm() {
   let valid = true;
-
-  const name = document.getElementById('clientName').value.trim();
-  const email = document.getElementById('clientEmail').value.trim();
-  const phone = document.getElementById('clientPhone').value.trim();
-  const date = document.getElementById('eventDate').value;
-  const guests = parseInt(document.getElementById('guestCount').value);
-
-  // Name
-  setFieldError('clientName', 'err-name', !name);
+  const name   = document.getElementById('clientName').value.trim();
+  const email  = document.getElementById('clientEmail').value.trim();
+  const phone  = document.getElementById('clientPhone').value.trim();
+  const date   = document.getElementById('eventDate').value;
+  setFieldError('clientName',  'err-name',  !name);
   if (!name) valid = false;
 
-  // Email
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   setFieldError('clientEmail', 'err-email', !emailOk);
   if (!emailOk) valid = false;
 
-  // Phone
   setFieldError('clientPhone', 'err-phone', !phone);
   if (!phone) valid = false;
 
-  // Date — must be at least leadTimeDays in future
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + CONFIG.leadTimeDays);
   const dateOk = date && new Date(date) >= minDate;
   setFieldError('eventDate', 'err-date', !dateOk);
   if (!dateOk) valid = false;
 
-  // Guests — must meet menu minimum
-  const minGuests = state.selectedMenu?.minGuests || 1;
-  const guestsOk = guests && guests >= minGuests;
-  document.getElementById('err-guests').textContent =
-    `Mínimo ${minGuests} pessoas para este menu`;
-  setFieldError('guestCount', 'err-guests', !guestsOk);
-  if (!guestsOk) valid = false;
-
   return valid;
 }
 
 function setFieldError(inputId, errId, hasError) {
-  const input = document.getElementById(inputId);
-  const err = document.getElementById(errId);
-  if (hasError) {
-    input.classList.add('error');
-    err.classList.add('visible');
-  } else {
-    input.classList.remove('error');
-    err.classList.remove('visible');
-  }
+  document.getElementById(inputId).classList.toggle('error', hasError);
+  document.getElementById(errId).classList.toggle('visible', hasError);
 }
 
 // ── RENDER SUMMARY ────────────────────────────────────────────────────────────
 function renderSummary() {
   const menu = state.selectedMenu;
-  const guests = parseInt(document.getElementById('guestCount').value);
-  const total = menu.pricePerPerson * guests;
+  const g = guests();
+  const total = menu.pricePerPerson * g;
 
-  // Build selections display
-  let selectionsHtml = '';
+  let selHtml = '';
   menu.courses.filter(c => c.active !== false)
     .sort((a,b) => a.displayOrder - b.displayOrder)
     .forEach(course => {
-      const sel = state.selections[course.id] || [];
-      const dishNames = sel.map(did => {
-        const d = course.dishes.find(d => d.id === did);
-        return d ? d.name : did;
-      });
-      selectionsHtml += `
-        <div class="summary-row">
-          <div class="summary-label">${course.name}</div>
-          <div class="summary-value">${dishNames.join(', ') || '—'}</div>
-        </div>`;
+      let value = '';
+
+      if (course.selectionRule === 'choose_one') {
+        const dishId = state.selections[course.id];
+        const dish = course.dishes.find(d => d.id === dishId);
+        value = dish ? dish.name : '\u2014';
+
+      } else if (course.selectionRule === 'choose_many') {
+        const ids = state.selections[course.id] || [];
+        value = ids.map(id => {
+          const d = course.dishes.find(d => d.id === id);
+          return d ? d.name : id;
+        }).join(', ') || '\u2014';
+
+      } else if (course.selectionRule === 'choose_split') {
+        const sel = state.selections[course.id] || {};
+        const parts = [];
+        course.subcategories.forEach(subcat => {
+          const s = sel[subcat.id];
+          if (s && s.qty > 0) {
+            const dish = subcat.dishes.find(d => d.id === s.dishId);
+            parts.push((dish ? dish.name : '?') + ' \u00D7 ' + s.qty);
+          }
+        });
+        value = parts.join('<br>') || '\u2014';
+      }
+
+      selHtml += '<div class="summary-row"><div class="summary-label">' + course.name + '</div>'
+        + '<div class="summary-value">' + value + '</div></div>';
     });
 
   const dateVal = document.getElementById('eventDate').value;
-  const dateFmt = dateVal ? new Date(dateVal + 'T12:00:00').toLocaleDateString('pt-PT', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  }) : '—';
+  const dateFmt = dateVal
+    ? new Date(dateVal + 'T12:00:00').toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '\u2014';
 
-  document.getElementById('summaryContent').innerHTML = `
-    <div class="summary-block">
-      <div class="summary-header">
-        <div class="summary-header-title">Menu selecionado</div>
-        <div class="summary-header-value">${menu.name}</div>
-      </div>
-      ${selectionsHtml}
-    </div>
-
-    <div class="summary-block">
-      <div class="summary-header">
-        <div class="summary-header-title">Detalhes do evento</div>
-      </div>
-      <div class="summary-row">
-        <div class="summary-label">Cliente</div>
-        <div class="summary-value">${document.getElementById('clientName').value}
-          ${document.getElementById('clientCompany').value ? ' · ' + document.getElementById('clientCompany').value : ''}
-        </div>
-      </div>
-      <div class="summary-row">
-        <div class="summary-label">Contacto</div>
-        <div class="summary-value">
-          ${document.getElementById('clientEmail').value} · ${document.getElementById('clientPhone').value}
-        </div>
-      </div>
-      <div class="summary-row">
-        <div class="summary-label">Data</div>
-        <div class="summary-value">${dateFmt}</div>
-      </div>
-      <div class="summary-row">
-        <div class="summary-label">Pessoas</div>
-        <div class="summary-value">${guests}</div>
-      </div>
-      ${document.getElementById('eventNotes').value ? `
-      <div class="summary-row">
-        <div class="summary-label">Notas</div>
-        <div class="summary-value" style="font-style:italic;font-weight:300">${document.getElementById('eventNotes').value}</div>
-      </div>` : ''}
-      <div class="summary-price-row">
-        <div>
-          <div class="summary-price-label">Total estimado</div>
-          <div class="summary-price-note">${guests} pessoas × ${menu.pricePerPerson}€</div>
-        </div>
-        <div class="summary-price-value">${total.toFixed(2)}€</div>
-      </div>
-    </div>
-  `;
+  document.getElementById('summaryContent').innerHTML =
+    '<div class="summary-block">'
+    + '<div class="summary-header"><div class="summary-header-title">Menu selecionado</div>'
+    + '<div class="summary-header-value">' + menu.name + '</div></div>'
+    + selHtml
+    + '</div>'
+    + '<div class="summary-block">'
+    + '<div class="summary-header"><div class="summary-header-title">Detalhes do evento</div></div>'
+    + '<div class="summary-row"><div class="summary-label">Cliente</div><div class="summary-value">'
+    + document.getElementById('clientName').value
+    + (document.getElementById('clientCompany').value ? ' \u00B7 ' + document.getElementById('clientCompany').value : '')
+    + '</div></div>'
+    + '<div class="summary-row"><div class="summary-label">Contacto</div><div class="summary-value">'
+    + document.getElementById('clientEmail').value + ' \u00B7 ' + document.getElementById('clientPhone').value
+    + '</div></div>'
+    + '<div class="summary-row"><div class="summary-label">Data</div><div class="summary-value">' + dateFmt + '</div></div>'
+    + '<div class="summary-row"><div class="summary-label">Pessoas</div><div class="summary-value">' + g + '</div></div>'
+    + (document.getElementById('eventNotes').value
+      ? '<div class="summary-row"><div class="summary-label">Notas</div><div class="summary-value" style="font-style:italic;font-weight:300">'
+        + document.getElementById('eventNotes').value + '</div></div>' : '')
+    + '<div class="summary-price-row">'
+    + '<div><div class="summary-price-label">Total estimado</div>'
+    + '<div class="summary-price-note">' + g + ' pessoas \u00D7 ' + menu.pricePerPerson + '\u20AC</div></div>'
+    + '<div class="summary-price-value">' + total.toFixed(2) + '\u20AC</div>'
+    + '</div></div>';
 }
 
-// ── SUBMIT ORDER ──────────────────────────────────────────────────────────────
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
 async function submitOrder() {
   const menu = state.selectedMenu;
-  const guests = parseInt(document.getElementById('guestCount').value);
+  const g = guests();
 
-  // Build selections summary
+  // Flatten selections to readable JSON for Fibery
   const selectionsData = {};
-  menu.courses.forEach(course => {
-    const sel = state.selections[course.id] || [];
-    selectionsData[course.name] = sel.map(did => {
-      const d = course.dishes.find(d => d.id === did);
-      return d ? d.name : did;
-    });
+  menu.courses.filter(c => c.active !== false).forEach(course => {
+    if (course.selectionRule === 'choose_one') {
+      const dish = course.dishes.find(d => d.id === state.selections[course.id]);
+      selectionsData[course.name] = dish ? dish.name : null;
+
+    } else if (course.selectionRule === 'choose_many') {
+      const ids = state.selections[course.id] || [];
+      selectionsData[course.name] = ids.map(id => {
+        const d = course.dishes.find(d => d.id === id);
+        return d ? d.name : id;
+      });
+
+    } else if (course.selectionRule === 'choose_split') {
+      const sel = state.selections[course.id] || {};
+      selectionsData[course.name] = {};
+      course.subcategories.forEach(subcat => {
+        const s = sel[subcat.id];
+        if (s && s.qty > 0) {
+          const dish = subcat.dishes.find(d => d.id === s.dishId);
+          selectionsData[course.name][subcat.name] = {
+            dish: dish ? dish.name : null,
+            qty: s.qty
+          };
+        }
+      });
+    }
   });
 
-  const orderPayload = {
-    clientName: document.getElementById('clientName').value.trim(),
-    clientEmail: document.getElementById('clientEmail').value.trim(),
-    clientPhone: document.getElementById('clientPhone').value.trim(),
-    clientCompany: document.getElementById('clientCompany').value.trim(),
-    eventDate: document.getElementById('eventDate').value,
-    guestCount: guests,
-    notes: document.getElementById('eventNotes').value.trim(),
-    menuId: menu.id,
-    menuName: menu.name,
+  const payload = {
+    clientName:     document.getElementById('clientName').value.trim(),
+    clientEmail:    document.getElementById('clientEmail').value.trim(),
+    clientPhone:    document.getElementById('clientPhone').value.trim(),
+    clientCompany:  document.getElementById('clientCompany').value.trim(),
+    eventDate:      document.getElementById('eventDate').value,
+    guestCount:     g,
+    notes:          document.getElementById('eventNotes').value.trim(),
+    menuName:       menu.name,
     pricePerPerson: menu.pricePerPerson,
-    totalEstimate: menu.pricePerPerson * guests,
-    selections: JSON.stringify(selectionsData),
-    status: 'New',
-    submittedAt: new Date().toISOString()
+    totalEstimate:  menu.pricePerPerson * g,
+    selections:     JSON.stringify(selectionsData),
+    status:         'New'
   };
 
   document.getElementById('loadingOverlay').classList.add('visible');
@@ -1196,73 +1531,65 @@ async function submitOrder() {
   document.getElementById('submitError').classList.remove('visible');
 
   try {
-    const result = await createFiberyOrder(orderPayload);
+    await createFiberyOrder(payload);
     document.getElementById('loadingOverlay').classList.remove('visible');
-
-    // Show success
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('section-success').classList.add('active');
     document.getElementById('orderRef').textContent = 'REF: ' + generateRef();
     window.scrollTo(0, 0);
-
   } catch (e) {
     document.getElementById('loadingOverlay').classList.remove('visible');
     document.getElementById('btn-submit').disabled = false;
     document.getElementById('submitError').classList.add('visible');
-    console.error('Submit error:', e);
+    console.error(e);
   }
 }
 
-// ── FIBERY API ────────────────────────────────────────────────────────────────
 async function createFiberyOrder(order) {
-  const url = `https://${CONFIG.fiberyWorkspace}.fibery.io/api/commands`;
-
-  const body = JSON.stringify([{
-    command: 'fibery.entity/create',
-    args: {
-      type: 'Catering/Orders',
-      entity: {
-        'Catering/Client Name': order.clientName,
-        'Catering/Client Email': order.clientEmail,
-        'Catering/Client Phone': order.clientPhone,
-        'Catering/Company': order.clientCompany,
-        'Catering/Event Date': order.eventDate,
-        'Catering/Guest Count': order.guestCount,
-        'Catering/Notes': order.notes,
-        'Catering/Menu Name': order.menuName,
-        'Catering/Price Per Person': order.pricePerPerson,
-        'Catering/Total Estimate': order.totalEstimate,
-        'Catering/Selections': order.selections,
-        'Catering/Status': order.status,
-        'fibery/name': `${order.clientName} — ${order.eventDate}`
-      }
-    }
-  }]);
-
+  const url = 'https://' + CONFIG.fiberyWorkspace + '.fibery.io/api/commands';
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Token ${CONFIG.fiberyToken}`
+      'Authorization': 'Token ' + CONFIG.fiberyToken
     },
-    body
+    body: JSON.stringify([{
+      command: 'fibery.entity/create',
+      args: {
+        type: 'Catering/Orders',
+        entity: {
+          'Catering/Client Name':     order.clientName,
+          'Catering/Client Email':    order.clientEmail,
+          'Catering/Client Phone':    order.clientPhone,
+          'Catering/Company':         order.clientCompany,
+          'Catering/Event Date':      order.eventDate,
+          'Catering/Guest Count':     order.guestCount,
+          'Catering/Notes':           order.notes,
+          'Catering/Menu Name':       order.menuName,
+          'Catering/Price Per Person':order.pricePerPerson,
+          'Catering/Total Estimate':  order.totalEstimate,
+          'Catering/Selections':      order.selections,
+          'Catering/Status':          order.status,
+          'fibery/name': order.clientName + ' \u2014 ' + order.eventDate
+        }
+      }
+    }])
   });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Fibery error ${response.status}: ${text}`);
-  }
-
-  return await response.json();
+  if (!response.ok) throw new Error('Fibery ' + response.status);
+  return response.json();
 }
 
 function generateRef() {
   const d = new Date();
-  return `NAVE-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${Math.random().toString(36).substr(2,5).toUpperCase()}`;
+  return 'NAVE-' + d.getFullYear()
+    + String(d.getMonth()+1).padStart(2,'0')
+    + String(d.getDate()).padStart(2,'0')
+    + '-' + Math.random().toString(36).substr(2,5).toUpperCase();
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 init();
+
 </script>
 </body>
 </html>
