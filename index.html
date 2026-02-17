@@ -1063,7 +1063,7 @@ function transformFiberyToMenuData(fiberyMenus) {
 function transformCourse(c) {
   const rule = c['Catering/Selection Rule'];
   const parentCourse = c['Catering/Parent Course'];
-  const parentId = parentCourse && parentCourse.length > 0 ? parentCourse[0]['fibery/id'] : null;
+  const parentId = parentCourse ? parentCourse['fibery/id'] : null;
   
   const base = {
     id: c['fibery/id'],
