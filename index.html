@@ -1459,8 +1459,15 @@ function updateCourseStatus(course, guests) {
   let valid = false, msg = '';
 
   // Check if all dishes are mandatory (auto-complete course)
-  const allMandatory = course.dishes && course.dishes.length > 0 && 
-                       course.dishes.every(d => d.mandatory);
+  let allMandatory = false;
+  if (course.selectionRule === 'choose_split' && course.subcategories) {
+    // For split courses, check all dishes across all subcategories
+    const allDishes = course.subcategories.flatMap(s => s.dishes || []);
+    allMandatory = allDishes.length > 0 && allDishes.every(d => d.mandatory);
+  } else if (course.dishes) {
+    // For regular courses
+    allMandatory = course.dishes.length > 0 && course.dishes.every(d => d.mandatory);
+  }
 
   if (allMandatory) {
     valid = true;
