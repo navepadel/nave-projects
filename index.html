@@ -1190,13 +1190,13 @@ function transformCourse(c) {
   };
 
   if (rule === 'choose_one') {
-    base.ruleLabel = c['Catering/Rule Label'] || 'escolha 1 para todo o grupo';
+    base.ruleLabel = c['Catering/Rule Label'] || '';
   } else if (rule === 'choose_many') {
     base.count = c['Catering/Count'] || 2;
-    base.ruleLabel = c['Catering/Rule Label'] || 'escolha ' + base.count;
+    base.ruleLabel = c['Catering/Rule Label'] || '';
   } else if (rule === 'choose_split') {
     base.minPct = c['Catering/Min Pct'] != null ? c['Catering/Min Pct'] : 0;
-    base.ruleLabel = c['Catering/Rule Label'] || 'distribua as quantidades';
+    base.ruleLabel = c['Catering/Rule Label'] || '';
     base.subcategories = []; // Will be populated by parent
   }
 
