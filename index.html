@@ -1200,13 +1200,16 @@ function transformCourse(c) {
     base.subcategories = []; // Will be populated by parent
   }
 
-  base.dishes = (c['Catering/Dishes'] || []).map(d => ({
-    id: d['fibery/id'],
-    name: d['Catering/Name'],
-    description: d['Catering/Description'] || '',
-    mandatory: d['Catering/Mandatory'] || false,
-    vegetarian: d['Catering/Vegetarian'] || false
-  }));
+  base.dishes = (c['Catering/Dishes'] || [])
+    .map(d => ({
+      id: d['fibery/id'],
+      name: d['Catering/Name'],
+      description: d['Catering/Description'] || '',
+      mandatory: d['Catering/Mandatory'] || false,
+      vegetarian: d['Catering/Vegetarian'] || false,
+      displayOrder: d['Catering/Display Order'] || 999
+    }))
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 
   return base;
 }
