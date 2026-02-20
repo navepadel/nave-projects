@@ -795,6 +795,11 @@
     .section-heading { font-size: 26px; }
     .btn-row { flex-direction: column; }
     .btn { width: 100%; text-align: center; }
+    
+    /* Prevent iOS zoom on input focus */
+    input, select, textarea {
+      font-size: 16px !important;
+    }
   }
   /* ── PRINT STYLES ── */
   @media print {
