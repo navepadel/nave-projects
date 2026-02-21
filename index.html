@@ -910,6 +910,11 @@
                oninput="onGuestCountChange()">
         <div class="field-error" id="err-guests"></div>
       </div>
+      <div class="form-group" style="max-width:220px">
+        <label>Data do Evento *</label>
+        <input type="date" id="eventDate">
+        <div class="field-error" id="err-date">Data inválida</div>
+      </div>
     </div>
 
     <div class="btn-row">
@@ -962,11 +967,6 @@
         <label>Telefone *</label>
         <input type="tel" id="clientPhone" placeholder="+351 9XX XXX XXX">
         <div class="field-error" id="err-phone">Campo obrigatório</div>
-      </div>
-      <div class="form-group">
-        <label>Data do Evento *</label>
-        <input type="date" id="eventDate">
-        <div class="field-error" id="err-date">Data inválida (mínimo 5 dias de antecedência)</div>
       </div>
       <div class="form-group full">
         <label>Notas adicionais</label>
@@ -1174,6 +1174,8 @@ function transformFiberyToMenuData(fiberyMenus) {
       pricePerPerson: m['Catering/Price per Person'] || 0,
       pricePerPersonWithVAT: m['Catering/Price per Person with VAT'] || 0,
       minGuests: m['Catering/Min Guests'] || 20,
+      leadTimeDays: m['Catering/Lead Time Days'] || 0,
+      paymentDueDays: m['Catering/Payment Due Days'] || 0,
       active: m['Catering/Active'] !== false,
       courses: parentCourses.sort((a, b) => a.displayOrder - b.displayOrder)
     };
@@ -1240,7 +1242,8 @@ function renderMenuCards() {
       + '<div class="menu-card-name">' + m.name + '</div>'
       + '<div class="menu-card-desc">' + (m.description || '') + '</div>'
       + '<div class="menu-card-price">' + m.pricePerPersonWithVAT + '\u20AC<span>(' + m.pricePerPerson + '\u20AC sem IVA)</span></div>'
-      + '<div class="menu-card-min">M\u00EDnimo ' + m.minGuests + ' pessoas</div>'
+      + '<div class="menu-card-min">M\u00EDnimo ' + m.minGuests + ' pessoas'
+      + (m.leadTimeDays > 0 ? ' \u00B7 ' + m.leadTimeDays + ' dias de anteced\u00EAncia' : '') + '</div>'
       + '</div>'
     ).join('');
 }
@@ -1572,6 +1575,7 @@ function goToStep(step) {
         return;
       }
       if (!validateGuestCount()) return;
+      if (!validateEventDate()) return;
     }
     if (state.currentStep === 2) {
       if (!validateAllCourses()) {
@@ -1619,12 +1623,22 @@ function onGuestCountChange() {
 }
 
 // ── FORM VALIDATION ───────────────────────────────────────────────────────────
+function validateEventDate() {
+  const date = document.getElementById('eventDate').value;
+  const leadTime = state.selectedMenu ? state.selectedMenu.leadTimeDays : 0;
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() + leadTime);
+  const dateOk = date && new Date(date) >= minDate;
+  setFieldError('eventDate', 'err-date', !dateOk);
+  return dateOk;
+}
+
 function validateEventForm() {
   let valid = true;
   const name   = document.getElementById('clientName').value.trim();
   const email  = document.getElementById('clientEmail').value.trim();
   const phone  = document.getElementById('clientPhone').value.trim();
-  const date   = document.getElementById('eventDate').value;
+  
   setFieldError('clientName',  'err-name',  !name);
   if (!name) valid = false;
 
@@ -1634,12 +1648,6 @@ function validateEventForm() {
 
   setFieldError('clientPhone', 'err-phone', !phone);
   if (!phone) valid = false;
-
-  const minDate = new Date();
-  minDate.setDate(minDate.getDate() + CONFIG.leadTimeDays);
-  const dateOk = date && new Date(date) >= minDate;
-  setFieldError('eventDate', 'err-date', !dateOk);
-  if (!dateOk) valid = false;
 
   return valid;
 }
@@ -1696,6 +1704,19 @@ function renderSummary() {
     ? new Date(dateVal + 'T12:00:00').toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })
     : '\u2014';
 
+  // Calculate payment due date
+  let paymentTermsHtml = '';
+  if (dateVal && menu.paymentDueDays > 0) {
+    const eventDate = new Date(dateVal);
+    const paymentDate = new Date(eventDate);
+    paymentDate.setDate(paymentDate.getDate() - menu.paymentDueDays);
+    const paymentDateFmt = paymentDate.toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' });
+    paymentTermsHtml = '<div class="summary-row" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--grey-light);">'
+      + '<div class="summary-label">Pagamento at\u00E9</div>'
+      + '<div class="summary-value" style="font-weight: 600; color: var(--ocre);">' + paymentDateFmt + ' (' + menu.paymentDueDays + ' dias antes do evento)</div>'
+      + '</div>';
+  }
+
   document.getElementById('summaryContent').innerHTML =
     '<div class="summary-block">'
     + '<div class="summary-header"><div class="summary-header-title">Menu selecionado</div>'
@@ -1716,6 +1737,7 @@ function renderSummary() {
     + (document.getElementById('eventNotes').value
       ? '<div class="summary-row"><div class="summary-label">Notas</div><div class="summary-value" style="font-style:italic;font-weight:300">'
         + document.getElementById('eventNotes').value + '</div></div>' : '')
+    + paymentTermsHtml
     + '<div class="summary-price-row">'
     + '<div><div class="summary-price-label">Total estimado (sem IVA)</div>'
     + '<div class="summary-price-note">' + g + ' pessoas \u00D7 ' + menu.pricePerPerson + '\u20AC</div></div>'
