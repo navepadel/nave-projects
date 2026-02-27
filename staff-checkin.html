@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NAVE. — Registo de Horas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocre: #BC5828;
+  --verde: #006E54;
+  --black: #0F0D0A;
+  --cream: #F7F4EF;
+  --cream-dark: #EDE9E1;
+  --grey: #7F7870;
+  --grey-light: #C8C4BC;
+  --white: #FFFFFF;
+  --error: #C0392B;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--cream);
+  color: var(--black);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ─── LOGO ─────────────────────────────────────────────── */
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+.logo span { color: var(--ocre); }
+
+.subtitle {
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 48px;
+}
+
+/* ─── CARD ──────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 32px rgba(15,13,10,0.08);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.card-hint {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--grey);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* ─── INPUTS ────────────────────────────────────────────── */
+.input-group {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 8px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 16px 20px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  background: var(--cream);
+  border: 2px solid var(--cream-dark);
+  border-radius: 10px;
+  color: var(--black);
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+.input-field:focus {
+  border-color: var(--ocre);
+}
+
+.input-field.error {
+  border-color: var(--error);
+}
+
+/* ─── BUTTONS ───────────────────────────────────────────── */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 24px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--ocre);
+  color: var(--white);
+}
+
+.btn-primary:hover:not(:disabled) { opacity: 0.88; }
+
+.btn-checkin {
+  background: var(--verde);
+  color: var(--white);
+  font-size: 1.15rem;
+  padding: 22px 24px;
+  margin-bottom: 12px;
+}
+
+.btn-checkin:hover:not(:disabled) { opacity: 0.88; }
+
+.btn-checkout {
+  background: var(--error);
+  color: var(--white);
+  font-size: 1.15rem;
+  padding: 22px 24px;
+  margin-bottom: 12px;
+}
+
+.btn-checkout:hover:not(:disabled) { opacity: 0.88; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--grey);
+  font-size: 0.8rem;
+  padding: 12px;
+  margin-top: 8px;
+  letter-spacing: 0.08em;
+}
+
+.btn-ghost:hover { color: var(--black); }
+
+/* ─── ERROR MESSAGE ─────────────────────────────────────── */
+.error-msg {
+  background: #fdf0ef;
+  border: 1px solid #f5c6c2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--error);
+  text-align: center;
+  margin-bottom: 20px;
+  display: none;
+}
+
+.error-msg.visible { display: block; }
+
+/* ─── STAFF INFO ────────────────────────────────────────── */
+.staff-greeting {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.staff-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--cream-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ocre);
+  margin: 0 auto 16px;
+  letter-spacing: 0.02em;
+}
+
+.staff-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.staff-meta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  margin-bottom: 4px;
+}
+
+.staff-status {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--grey);
+}
+
+.open-entry-info {
+  background: var(--cream);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.open-entry-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 6px;
+}
+
+.open-entry-time {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--verde);
+  letter-spacing: 0.04em;
+}
+
+.open-entry-duration {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--grey);
+  margin-top: 2px;
+}
+
+/* ─── CONFIRMATION ──────────────────────────────────────── */
+.confirm-icon {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.confirm-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.confirm-detail {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--grey);
+  text-align: center;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.confirm-detail strong {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.countdown-bar-wrap {
+  background: var(--cream-dark);
+  border-radius: 999px;
+  height: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.countdown-bar {
+  height: 100%;
+  background: var(--ocre);
+  border-radius: 999px;
+  width: 100%;
+  transition: width 1s linear;
+}
+
+.countdown-label {
+  font-size: 0.75rem;
+  color: var(--grey);
+  text-align: center;
+  font-weight: 300;
+}
+
+/* ─── LOADING ───────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── SCREEN MANAGEMENT ─────────────────────────────────── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ─── FOOTER ────────────────────────────────────────────── */
+.footer {
+  margin-top: 32px;
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey-light);
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card { padding: 32px 24px; }
+  body { padding: 16px; justify-content: flex-start; padding-top: 48px; }
+}
+</style>
+</head>
+<body>
+
+<div class="logo">NAVE<span>.</span></div>
+<div class="subtitle">Registo de Horas</div>
+
+<div class="card">
+
+  <!-- ── SCREEN 1: Phone entry ──────────────────────────── -->
+  <div id="screen-phone" class="screen active">
+    <div class="card-title">Identificação</div>
+    <div class="card-hint">Introduza o seu número de telemóvel</div>
+
+    <div id="error-phone" class="error-msg"></div>
+
+    <div class="input-group">
+      <label class="input-label" for="phone-input">Telemóvel</label>
+      <input
+        id="phone-input"
+        class="input-field"
+        type="tel"
+        inputmode="numeric"
+        placeholder="9XX XXX XXX"
+        maxlength="20"
+        autocomplete="tel"
+        autofocus
+      >
+    </div>
+
+    <button id="btn-lookup" class="btn btn-primary" onclick="handleLookup()">
+      Continuar
+    </button>
+  </div>
+
+  <!-- ── SCREEN 2: Check in / Check out ────────────────── -->
+  <div id="screen-action" class="screen">
+    <div class="staff-greeting">
+      <div id="staff-avatar" class="staff-avatar"></div>
+      <div id="staff-name" class="staff-name"></div>
+      <div id="staff-meta" class="staff-meta" style="display:none"></div>
+      <div id="staff-status" class="staff-status"></div>
+    </div>
+
+    <div id="open-entry-box" class="open-entry-info" style="display:none">
+      <div class="open-entry-label">Entrada registada às</div>
+      <div id="open-entry-time" class="open-entry-time"></div>
+      <div id="open-entry-duration" class="open-entry-duration"></div>
+    </div>
+
+    <div id="error-action" class="error-msg"></div>
+
+    <button id="btn-checkin" class="btn btn-checkin" onclick="handleCheckin()" style="display:none">
+      &#9654; Registar Entrada
+    </button>
+
+    <button id="btn-checkout" class="btn btn-checkout" onclick="handleCheckout()" style="display:none">
+      &#9646;&#9646; Registar Saída
+    </button>
+
+    <button class="btn btn-ghost" onclick="goToPhone()">
+      ← Voltar
+    </button>
+  </div>
+
+  <!-- ── SCREEN 3: Confirmation ─────────────────────────── -->
+  <div id="screen-confirm" class="screen">
+    <div id="confirm-icon" class="confirm-icon"></div>
+    <div id="confirm-title" class="confirm-title"></div>
+    <div id="confirm-detail" class="confirm-detail"></div>
+
+    <div class="countdown-bar-wrap">
+      <div id="countdown-bar" class="countdown-bar"></div>
+    </div>
+    <div id="countdown-label" class="countdown-label"></div>
+  </div>
+
+</div>
+
+<div class="footer">NAVE Academy &mdash; Staff Portal</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  CONFIGURATION
+//  Replace these webhook URLs with your Make.com scenario URLs.
+//
+//  Expected request/response contracts:
+//
+//  LOOKUP_WEBHOOK (POST)
+//    Request:  { phone: "351912345678" }
+//    Response (found):
+//      {
+//        found: true,
+//        staffId:    "fibery-uuid",
+//        name:       "João Silva",
+//        email:      "joao@navepadel.pt",       ← optional
+//        role:       "Instrutor",               ← optional
+//        department: "Padel",                   ← optional
+//        phone:      "351912345678",            ← normalised
+//        openEntry:  null
+//           — or —
+//        openEntry:  { id: "fibery-uuid", checkInTime: "2026-02-27T09:00:00Z" }
+//      }
+//    Response (not found):
+//      { found: false }
+//
+//  CHECKIN_WEBHOOK (POST)
+//    Request:
+//      { staffId: "...", staffName: "...", role: "...", department: "...",
+//        phone: "...", timestamp: "2026-02-27T09:00:00Z" }
+//    Response: { success: true, entryId: "..." }
+//
+//  CHECKOUT_WEBHOOK (POST)
+//    Request:
+//      { entryId: "...", staffId: "...", staffName: "...", role: "...",
+//        department: "...", phone: "...", timestamp: "2026-02-27T18:00:00Z" }
+//    Response: { success: true, duration: "8h 30m" }   ← duration optional
+// ─────────────────────────────────────────────────────────────
+const CONFIG = {
+  lookupWebhook:   'LOOKUP_STAFF_WEBHOOK_URL',
+  checkinWebhook:  'CHECKIN_WEBHOOK_URL',
+  checkoutWebhook: 'CHECKOUT_WEBHOOK_URL',
+  resetDelay:      6,   // seconds before auto-reset after confirmation
+};
+
+// ─── STATE ────────────────────────────────────────────────────
+let state = {
+  phone:      '',
+  staffId:    '',
+  staffName:  '',
+  role:       '',
+  department: '',
+  email:      '',
+  openEntry:  null,   // { id, checkInTime } or null
+};
+
+// ─── SCREEN HELPERS ───────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function clearError(elId) {
+  const el = document.getElementById(elId);
+  el.textContent = '';
+  el.classList.remove('visible');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.disabled = true;
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span>';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+  }
+}
+
+// ─── PHONE FORMATTING ─────────────────────────────────────────
+function normalisePhone(raw) {
+  // Strip spaces, dashes, parentheses
+  let digits = raw.replace(/\D/g, '');
+  // Add Portugal country code if local number
+  if (digits.startsWith('9') && digits.length === 9) digits = '351' + digits;
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  return digits;
+}
+
+function initPhoneInput() {
+  const input = document.getElementById('phone-input');
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLookup();
+  });
+  input.addEventListener('input', () => {
+    input.classList.remove('error');
+    clearError('error-phone');
+  });
+}
+
+// ─── SCREEN 1: LOOKUP ─────────────────────────────────────────
+async function handleLookup() {
+  const raw = document.getElementById('phone-input').value.trim();
+  if (!raw) return;
+
+  const phone = normalisePhone(raw);
+  if (phone.length < 9) {
+    document.getElementById('phone-input').classList.add('error');
+    showError('error-phone', 'Número inválido. Verifique e tente novamente.');
+    return;
+  }
+
+  clearError('error-phone');
+  setLoading('btn-lookup', true);
+
+  try {
+    const res = await fetch(CONFIG.lookupWebhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone }),
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (!data.found) {
+      document.getElementById('phone-input').classList.add('error');
+      showError('error-phone', 'Número não encontrado. Contacte a administração.');
+      setLoading('btn-lookup', false);
+      return;
+    }
+
+    state.phone      = phone;
+    state.staffId    = data.staffId;
+    state.staffName  = data.name;
+    state.role       = data.role       || '';
+    state.department = data.department || '';
+    state.email      = data.email      || '';
+    state.openEntry  = data.openEntry  || null;
+
+    renderActionScreen();
+    showScreen('screen-action');
+
+  } catch (err) {
+    showError('error-phone', 'Erro de ligação. Verifique a rede e tente novamente.');
+    console.error('Lookup error:', err);
+  } finally {
+    setLoading('btn-lookup', false);
+  }
+}
+
+// ─── SCREEN 2: ACTION ─────────────────────────────────────────
+function renderActionScreen() {
+  clearError('error-action');
+
+  // Avatar initials
+  const initials = state.staffName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join('');
+  document.getElementById('staff-avatar').textContent = initials;
+  document.getElementById('staff-name').textContent = state.staffName;
+
+  // Show role / department if available
+  const meta = [state.role, state.department].filter(Boolean).join(' · ');
+  if (meta) {
+    const metaEl = document.getElementById('staff-meta');
+    metaEl.textContent = meta;
+    metaEl.style.display = 'block';
+  } else {
+    document.getElementById('staff-meta').style.display = 'none';
+  }
+
+  const checkinBtn  = document.getElementById('btn-checkin');
+  const checkoutBtn = document.getElementById('btn-checkout');
+  const entryBox    = document.getElementById('open-entry-box');
+
+  if (state.openEntry) {
+    // Staff already checked in → show check-out
+    const checkInDate = new Date(state.openEntry.checkInTime);
+    const timeStr = checkInDate.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+
+    document.getElementById('staff-status').textContent = 'Entrada registada hoje';
+    document.getElementById('open-entry-time').textContent = timeStr;
+    document.getElementById('open-entry-duration').textContent = formatDuration(checkInDate, new Date());
+
+    entryBox.style.display = 'block';
+    checkinBtn.style.display  = 'none';
+    checkoutBtn.style.display = 'flex';
+
+    // Update duration live every minute
+    clearInterval(window._durationTimer);
+    window._durationTimer = setInterval(() => {
+      document.getElementById('open-entry-duration').textContent =
+        formatDuration(checkInDate, new Date());
+    }, 60000);
+  } else {
+    document.getElementById('staff-status').textContent = 'Pronto para registar entrada';
+    entryBox.style.display = 'none';
+    checkinBtn.style.display  = 'flex';
+    checkoutBtn.style.display = 'none';
+  }
+}
+
+function formatDuration(start, end) {
+  const mins = Math.floor((end - start) / 60000);
+  if (mins < 60) return mins + ' min em serviço';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h + 'h ' + (m > 0 ? m + 'min ' : '') + 'em serviço';
+}
+
+// ─── CHECK IN ─────────────────────────────────────────────────
+async function handleCheckin() {
+  clearError('error-action');
+  setLoading('btn-checkin', true);
+
+  const now = new Date();
+
+  try {
+    const res = await fetch(CONFIG.checkinWebhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        staffId:    state.staffId,
+        staffName:  state.staffName,
+        role:       state.role,
+        department: state.department,
+        email:      state.email,
+        phone:      state.phone,
+        timestamp:  now.toISOString(),
+      }),
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.success) throw new Error('Webhook returned failure');
+
+    const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    showConfirmation(
+      '✅',
+      'Entrada registada!',
+      `Olá, <strong>${state.staffName}</strong>!<br>Entrada registada às <strong>${timeStr}</strong>.`
+    );
+
+  } catch (err) {
+    showError('error-action', 'Erro ao registar entrada. Tente novamente.');
+    console.error('Check-in error:', err);
+  } finally {
+    setLoading('btn-checkin', false);
+  }
+}
+
+// ─── CHECK OUT ────────────────────────────────────────────────
+async function handleCheckout() {
+  clearError('error-action');
+  setLoading('btn-checkout', true);
+  clearInterval(window._durationTimer);
+
+  const now = new Date();
+
+  try {
+    const res = await fetch(CONFIG.checkoutWebhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        entryId:    state.openEntry.id,
+        staffId:    state.staffId,
+        staffName:  state.staffName,
+        role:       state.role,
+        department: state.department,
+        email:      state.email,
+        phone:      state.phone,
+        timestamp:  now.toISOString(),
+      }),
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.success) throw new Error('Webhook returned failure');
+
+    const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    const checkInDate = new Date(state.openEntry.checkInTime);
+    const duration = data.duration || formatDuration(checkInDate, now);
+
+    showConfirmation(
+      '👋',
+      'Saída registada!',
+      `Até logo, <strong>${state.staffName}</strong>!<br>Saída às <strong>${timeStr}</strong>.<br><span style="margin-top:4px;display:inline-block">${duration}</span>`
+    );
+
+  } catch (err) {
+    showError('error-action', 'Erro ao registar saída. Tente novamente.');
+    console.error('Check-out error:', err);
+  } finally {
+    setLoading('btn-checkout', false);
+  }
+}
+
+// ─── CONFIRMATION + AUTO RESET ────────────────────────────────
+function showConfirmation(icon, title, detail) {
+  document.getElementById('confirm-icon').textContent = icon;
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-detail').innerHTML = detail;
+  showScreen('screen-confirm');
+
+  const total = CONFIG.resetDelay;
+  let remaining = total;
+
+  const bar   = document.getElementById('countdown-bar');
+  const label = document.getElementById('countdown-label');
+
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+
+  // Trigger reflow then animate
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.transition = `width ${total}s linear`;
+      bar.style.width = '0%';
+    });
+  });
+
+  label.textContent = `A voltar ao início em ${remaining}s…`;
+
+  const tick = setInterval(() => {
+    remaining--;
+    label.textContent = `A voltar ao início em ${remaining}s…`;
+    if (remaining <= 0) {
+      clearInterval(tick);
+      reset();
+    }
+  }, 1000);
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────
+function goToPhone() {
+  clearInterval(window._durationTimer);
+  reset();
+}
+
+function reset() {
+  state = { phone: '', staffId: '', staffName: '', openEntry: null };
+  const input = document.getElementById('phone-input');
+  input.value = '';
+  input.classList.remove('error');
+  clearError('error-phone');
+  clearError('error-action');
+  showScreen('screen-phone');
+  setTimeout(() => input.focus(), 100);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initPhoneInput();
+  document.getElementById('phone-input').focus();
+});
+</script>
+</body>
+</html>
