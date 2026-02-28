@@ -432,78 +432,31 @@ body {
 <div class="footer">NAVE Academy &mdash; Staff Portal</div>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-//  CONFIGURATION
-//  Replace these webhook URLs with your Make.com scenario URLs.
-//
-//  Expected request/response contracts:
-//
-//  LOOKUP_WEBHOOK (POST)
-//    Request:  { phone: "351912345678" }
-//    Response (found):
-//      {
-//        found: true,
-//        staffId:    "fibery-uuid",
-//        name:       "João Silva",
-//        email:      "joao@navepadel.pt",       ← optional
-//        role:       "Instrutor",               ← optional
-//        department: "Padel",                   ← optional
-//        phone:      "351912345678",            ← normalised
-//        openEntry:  null
-//           — or —
-//        openEntry:  { id: "fibery-uuid", checkInTime: "2026-02-27T09:00:00Z" }
-//      }
-//    Response (not found):
-//      { found: false }
-//
-//  CHECKIN_WEBHOOK (POST)
-//    Request:
-//      { staffId: "...", staffName: "...", role: "...", department: "...",
-//        phone: "...", timestamp: "2026-02-27T09:00:00Z" }
-//    Response: { success: true, entryId: "..." }
-//
-//  CHECKOUT_WEBHOOK (POST)
-//    Request:
-//      { entryId: "...", staffId: "...", staffName: "...", role: "...",
-//        department: "...", phone: "...", timestamp: "2026-02-27T18:00:00Z" }
-//    Response: { success: true, duration: "8h 30m" }   ← duration optional
-// ─────────────────────────────────────────────────────────────
 const CONFIG = {
-  lookupWebhook:   'LOOKUP_STAFF_WEBHOOK_URL',
-  checkinWebhook:  'CHECKIN_WEBHOOK_URL',
-  checkoutWebhook: 'CHECKOUT_WEBHOOK_URL',
-  resetDelay:      6,   // seconds before auto-reset after confirmation
+  lookupWebhook:   'https://hook.eu2.make.com/fgkr6f4k6lrvs9t7myyd0ijc0c4udf5f',
+  checkinWebhook:  'https://hook.eu2.make.com/bbr5r1njof3hkljnocsjkirb1aohsrq4',
+  checkoutWebhook: 'https://hook.eu2.make.com/ymqd52dw926iymjx0sg4bwbmbv1yr8mw',
+  resetDelay:      6,
 };
 
-// ─── STATE ────────────────────────────────────────────────────
 let state = {
-  phone:      '',
-  staffId:    '',
-  staffName:  '',
-  role:       '',
-  department: '',
-  email:      '',
-  openEntry:  null,   // { id, checkInTime } or null
+  phone: '', staffId: '', staffName: '', role: '', department: '', email: '', openEntry: null,
 };
 
-// ─── SCREEN HELPERS ───────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-
 function showError(elId, msg) {
   const el = document.getElementById(elId);
   el.textContent = msg;
   el.classList.add('visible');
 }
-
 function clearError(elId) {
   const el = document.getElementById(elId);
   el.textContent = '';
   el.classList.remove('visible');
 }
-
 function setLoading(btnId, loading) {
   const btn = document.getElementById(btnId);
   if (loading) {
@@ -516,11 +469,8 @@ function setLoading(btnId, loading) {
   }
 }
 
-// ─── PHONE FORMATTING ─────────────────────────────────────────
 function normalisePhone(raw) {
-  // Strip spaces, dashes, parentheses
   let digits = raw.replace(/\D/g, '');
-  // Add Portugal country code if local number
   if (digits.startsWith('9') && digits.length === 9) digits = '351' + digits;
   if (digits.startsWith('00')) digits = digits.slice(2);
   return digits;
@@ -528,47 +478,35 @@ function normalisePhone(raw) {
 
 function initPhoneInput() {
   const input = document.getElementById('phone-input');
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleLookup();
-  });
-  input.addEventListener('input', () => {
-    input.classList.remove('error');
-    clearError('error-phone');
-  });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') handleLookup(); });
+  input.addEventListener('input', () => { input.classList.remove('error'); clearError('error-phone'); });
 }
 
-// ─── SCREEN 1: LOOKUP ─────────────────────────────────────────
 async function handleLookup() {
   const raw = document.getElementById('phone-input').value.trim();
   if (!raw) return;
-
   const phone = normalisePhone(raw);
   if (phone.length < 9) {
     document.getElementById('phone-input').classList.add('error');
     showError('error-phone', 'Número inválido. Verifique e tente novamente.');
     return;
   }
-
   clearError('error-phone');
   setLoading('btn-lookup', true);
-
   try {
     const res = await fetch(CONFIG.lookupWebhook, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ phone }),
     });
-
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-
     if (!data.found) {
       document.getElementById('phone-input').classList.add('error');
       showError('error-phone', 'Número não encontrado. Contacte a administração.');
       setLoading('btn-lookup', false);
       return;
     }
-
     state.phone      = phone;
     state.staffId    = data.staffId;
     state.staffName  = data.name;
@@ -576,10 +514,8 @@ async function handleLookup() {
     state.department = data.department || '';
     state.email      = data.email      || '';
     state.openEntry  = data.openEntry  || null;
-
     renderActionScreen();
     showScreen('screen-action');
-
   } catch (err) {
     showError('error-phone', 'Erro de ligação. Verifique a rede e tente novamente.');
     console.error('Lookup error:', err);
@@ -588,21 +524,11 @@ async function handleLookup() {
   }
 }
 
-// ─── SCREEN 2: ACTION ─────────────────────────────────────────
 function renderActionScreen() {
   clearError('error-action');
-
-  // Avatar initials
-  const initials = state.staffName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(w => w[0].toUpperCase())
-    .join('');
+  const initials = state.staffName.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
   document.getElementById('staff-avatar').textContent = initials;
   document.getElementById('staff-name').textContent = state.staffName;
-
-  // Show role / department if available
   const meta = [state.role, state.department].filter(Boolean).join(' · ');
   if (meta) {
     const metaEl = document.getElementById('staff-meta');
@@ -611,29 +537,21 @@ function renderActionScreen() {
   } else {
     document.getElementById('staff-meta').style.display = 'none';
   }
-
   const checkinBtn  = document.getElementById('btn-checkin');
   const checkoutBtn = document.getElementById('btn-checkout');
   const entryBox    = document.getElementById('open-entry-box');
-
   if (state.openEntry) {
-    // Staff already checked in → show check-out
     const checkInDate = new Date(state.openEntry.checkInTime);
     const timeStr = checkInDate.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
-
     document.getElementById('staff-status').textContent = 'Entrada registada hoje';
     document.getElementById('open-entry-time').textContent = timeStr;
     document.getElementById('open-entry-duration').textContent = formatDuration(checkInDate, new Date());
-
     entryBox.style.display = 'block';
     checkinBtn.style.display  = 'none';
     checkoutBtn.style.display = 'flex';
-
-    // Update duration live every minute
     clearInterval(window._durationTimer);
     window._durationTimer = setInterval(() => {
-      document.getElementById('open-entry-duration').textContent =
-        formatDuration(checkInDate, new Date());
+      document.getElementById('open-entry-duration').textContent = formatDuration(checkInDate, new Date());
     }, 60000);
   } else {
     document.getElementById('staff-status').textContent = 'Pronto para registar entrada';
@@ -651,39 +569,26 @@ function formatDuration(start, end) {
   return h + 'h ' + (m > 0 ? m + 'min ' : '') + 'em serviço';
 }
 
-// ─── CHECK IN ─────────────────────────────────────────────────
 async function handleCheckin() {
   clearError('error-action');
   setLoading('btn-checkin', true);
-
   const now = new Date();
-
   try {
     const res = await fetch(CONFIG.checkinWebhook, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
-        staffId:    state.staffId,
-        staffName:  state.staffName,
-        role:       state.role,
-        department: state.department,
-        email:      state.email,
-        phone:      state.phone,
-        timestamp:  now.toISOString(),
+        staffId: state.staffId, staffName: state.staffName, role: state.role,
+        department: state.department, email: state.email, phone: state.phone,
+        timestamp: now.toISOString(),
       }),
     });
-
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data.success) throw new Error('Webhook returned failure');
-
     const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
-    showConfirmation(
-      '✅',
-      'Entrada registada!',
-      `Olá, <strong>${state.staffName}</strong>!<br>Entrada registada às <strong>${timeStr}</strong>.`
-    );
-
+    showConfirmation('✅', 'Entrada registada!',
+      `Olá, <strong>${state.staffName}</strong>!<br>Entrada registada às <strong>${timeStr}</strong>.`);
   } catch (err) {
     showError('error-action', 'Erro ao registar entrada. Tente novamente.');
     console.error('Check-in error:', err);
@@ -692,44 +597,29 @@ async function handleCheckin() {
   }
 }
 
-// ─── CHECK OUT ────────────────────────────────────────────────
 async function handleCheckout() {
   clearError('error-action');
   setLoading('btn-checkout', true);
   clearInterval(window._durationTimer);
-
   const now = new Date();
-
   try {
     const res = await fetch(CONFIG.checkoutWebhook, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
-        entryId:    state.openEntry.id,
-        staffId:    state.staffId,
-        staffName:  state.staffName,
-        role:       state.role,
-        department: state.department,
-        email:      state.email,
-        phone:      state.phone,
-        timestamp:  now.toISOString(),
+        entryId: state.openEntry.id, staffId: state.staffId, staffName: state.staffName,
+        role: state.role, department: state.department, email: state.email,
+        phone: state.phone, timestamp: now.toISOString(),
       }),
     });
-
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data.success) throw new Error('Webhook returned failure');
-
     const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
     const checkInDate = new Date(state.openEntry.checkInTime);
     const duration = data.duration || formatDuration(checkInDate, now);
-
-    showConfirmation(
-      '👋',
-      'Saída registada!',
-      `Até logo, <strong>${state.staffName}</strong>!<br>Saída às <strong>${timeStr}</strong>.<br><span style="margin-top:4px;display:inline-block">${duration}</span>`
-    );
-
+    showConfirmation('👋', 'Saída registada!',
+      `Até logo, <strong>${state.staffName}</strong>!<br>Saída às <strong>${timeStr}</strong>.<br><span style="margin-top:4px;display:inline-block">${duration}</span>`);
   } catch (err) {
     showError('error-action', 'Erro ao registar saída. Tente novamente.');
     console.error('Check-out error:', err);
@@ -738,50 +628,35 @@ async function handleCheckout() {
   }
 }
 
-// ─── CONFIRMATION + AUTO RESET ────────────────────────────────
 function showConfirmation(icon, title, detail) {
   document.getElementById('confirm-icon').textContent = icon;
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-detail').innerHTML = detail;
   showScreen('screen-confirm');
-
   const total = CONFIG.resetDelay;
   let remaining = total;
-
   const bar   = document.getElementById('countdown-bar');
   const label = document.getElementById('countdown-label');
-
   bar.style.transition = 'none';
   bar.style.width = '100%';
-
-  // Trigger reflow then animate
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       bar.style.transition = `width ${total}s linear`;
       bar.style.width = '0%';
     });
   });
-
   label.textContent = `A voltar ao início em ${remaining}s…`;
-
   const tick = setInterval(() => {
     remaining--;
     label.textContent = `A voltar ao início em ${remaining}s…`;
-    if (remaining <= 0) {
-      clearInterval(tick);
-      reset();
-    }
+    if (remaining <= 0) { clearInterval(tick); reset(); }
   }, 1000);
 }
 
-// ─── NAVIGATION ───────────────────────────────────────────────
-function goToPhone() {
-  clearInterval(window._durationTimer);
-  reset();
-}
+function goToPhone() { clearInterval(window._durationTimer); reset(); }
 
 function reset() {
-  state = { phone: '', staffId: '', staffName: '', openEntry: null };
+  state = { phone: '', staffId: '', staffName: '', role: '', department: '', email: '', openEntry: null };
   const input = document.getElementById('phone-input');
   input.value = '';
   input.classList.remove('error');
@@ -791,7 +666,6 @@ function reset() {
   setTimeout(() => input.focus(), 100);
 }
 
-// ─── INIT ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initPhoneInput();
   document.getElementById('phone-input').focus();
