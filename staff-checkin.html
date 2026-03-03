@@ -591,6 +591,7 @@ async function handleLookup() {
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
+    console.log('[NAVE debug] lookup response:', JSON.stringify(data));
 
     if (!data.found) {
       document.getElementById('phone-input').classList.add('error');
