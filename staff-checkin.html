@@ -114,6 +114,11 @@ body {
   border-color: var(--ocre);
 }
 
+#time-input::-webkit-datetime-edit,
+#time-input::-webkit-datetime-edit-fields-wrapper {
+  text-align: center;
+}
+
 .input-field.error {
   border-color: var(--error);
 }
@@ -222,11 +227,10 @@ body {
 }
 
 .staff-meta {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ocre);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--grey);
   margin-bottom: 4px;
 }
 
@@ -748,7 +752,12 @@ function renderActionScreen() {
   document.getElementById('staff-avatar').textContent = initials;
   document.getElementById('staff-name').textContent = state.staffName;
 
-  document.getElementById('staff-meta').style.display = 'none';
+  const metaParts = [state.phone];
+  if (state.email) metaParts.push(state.email);
+  if (state.nif)   metaParts.push(state.nif);
+  const metaEl = document.getElementById('staff-meta');
+  metaEl.textContent = metaParts.join(' · ');
+  metaEl.style.display = 'block';
 
   const checkinBtn  = document.getElementById('btn-checkin');
   const checkoutBtn = document.getElementById('btn-checkout');
