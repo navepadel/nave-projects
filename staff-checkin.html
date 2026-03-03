@@ -354,19 +354,21 @@ body {
 /* ─── RECENT ENTRIES ─────────────────────────────────────── */
 .entry-item { border-bottom:1px solid var(--cream-dark); }
 .entry-item:last-child { border-bottom:none; }
-.entry-row { display:flex; align-items:center; gap:10px; padding:10px 14px; }
+.entry-row { display:flex; align-items:center; padding:10px 14px; }
 .entry-date { font-size:.75rem; font-weight:600; color:var(--grey);
-              white-space:nowrap; min-width:56px; }
-.entry-times { flex:1; font-size:.875rem; }
+              white-space:nowrap; width:56px; flex-shrink:0; }
+.entry-times { font-size:.875rem; width:130px; flex-shrink:0; }
 .entry-duration { font-size:.7rem; font-weight:600; color:var(--verde);
                   background:rgba(0,110,84,.08); padding:3px 8px;
-                  border-radius:999px; white-space:nowrap; }
+                  border-radius:999px; white-space:nowrap;
+                  width:60px; flex-shrink:0; text-align:center; }
 .entry-status-row { display:flex; align-items:center; gap:6px;
                     padding:0 14px 8px 76px; }
 .entry-status-badge { font-size:.65rem; font-weight:600; letter-spacing:.06em;
                       text-transform:uppercase; color:var(--grey);
                       background:var(--cream-dark); padding:2px 7px;
-                      border-radius:999px; white-space:nowrap; }
+                      border-radius:999px; white-space:nowrap;
+                      flex-shrink:0; }
 .entry-status-date { font-size:.68rem; color:var(--grey-light); }
 .entries-empty { padding:18px 14px; text-align:center; font-size:.8rem;
                  font-weight:300; color:var(--grey); }
