@@ -665,13 +665,14 @@ function renderRecentEntries() {
       badge = '<span class="entry-duration">' + dur + '</span>';
     }
 
+    const statusLabel = e.status || (e.state && e.state.name) || '';
     let statusRow = '';
-    if (e.status) {
+    if (statusLabel) {
       const statusDateLabel = e.statusDate
         ? new Date(e.statusDate).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' })
         : '';
       statusRow = '<div class="entry-status-row">' +
-        '<span class="entry-status-badge">' + e.status + '</span>' +
+        '<span class="entry-status-badge">' + statusLabel + '</span>' +
         (statusDateLabel ? '<span class="entry-status-date">' + statusDateLabel + '</span>' : '') +
         '</div>';
     }
