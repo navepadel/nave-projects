@@ -641,6 +641,8 @@ async function handleLookup() {
     state.email     = data.email || '';
     state.openEntry     = (data.openEntry && data.openEntry.exists) ? data.openEntry : null;
     state.recentEntries = Array.isArray(data.recentEntries) ? data.recentEntries : [];
+    console.log('[lookup] openEntry:', JSON.stringify(state.openEntry));
+    console.log('[lookup] recentEntries[0]:', JSON.stringify(state.recentEntries[0]));
 
     renderActionScreen();
     showScreen('screen-action');
